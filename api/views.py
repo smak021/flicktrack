@@ -11,6 +11,13 @@ from .serializers import dataserializer,filmserializer,filmlocserializer
 
 
 # Create your views here.
+
+
+def home_pg(self):
+    return HttpResponse('<h2>Hello</h2>')
+
+
+
 @csrf_exempt
 def track_list(request):
 
