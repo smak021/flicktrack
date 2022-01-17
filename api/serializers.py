@@ -10,7 +10,7 @@ class dataserializer(serializers.ModelSerializer):
 class filmserializer(serializers.ModelSerializer):
     class Meta:
         model = film_det
-        fields= ['film_name','film_id','release_date','film_loc']
+        fields= ['film_name','film_id','release_date','image_url','film_loc']
 
 class filmlocserializer(serializers.ModelSerializer):
     class Meta:

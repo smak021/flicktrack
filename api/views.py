@@ -135,3 +135,18 @@ def loc_det(request):
             serializer.save()
             return JsonResponse(serializer.data)
         return JsonResponse(serializer.errors)
+
+
+@csrf_exempt
+def single_film_list(request, filmid):
+    if request.method == 'GET':
+        ftdata = ft_data.objects.filter(film_id__exact=filmid)
+        serializer = dataserializer(ftdata, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+@csrf_exempt
+def get_single_film_list(request, filmid):
+    if request.method == 'GET':
+        ftdata = film_det.objects.filter(film_id__exact=filmid)
+        serializer = filmserializer(ftdata, many=True)
+        return JsonResponse(serializer.data, safe=False)

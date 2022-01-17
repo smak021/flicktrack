@@ -13,9 +13,10 @@ for fmlo in json_data:
         print(film_name)
         film_id = str(i["ChildEvents"][0]['EventCode'])
         release_date = str(i["ChildEvents"][0]['EventDate'])
+        image_url = str(i["ChildEvents"][0]['EventImageCode'])
         film_loc = str(i["ChildEvents"][0]['RegCode'])
         print(film_loc)
-        payload1={"film_name": film_name, "film_id": film_id, "release_date": release_date, "film_loc":film_loc}
+        payload1={"film_name": film_name, "film_id": film_id, "release_date": release_date, "image_url":image_url, "film_loc":film_loc}
         payload1_json = json.dumps(payload1)
         url1=requests.put('http://127.0.0.1:8000/getfilmdata/'+film_id+'/'+film_loc+'/', json=payload1, headers={'Content-type': 'application/json'})
         print(url1.text)

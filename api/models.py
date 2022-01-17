@@ -28,8 +28,8 @@ class film_det(models.Model):
     film_name = models.CharField(max_length=100)
     film_id = models.CharField(max_length=100)
     release_date=models.CharField(max_length=50)
+    image_url = models.CharField(max_length=150,default='18am-padi-et00105977-28-06-2019-01-18-50')
     film_loc = models.CharField(max_length=100)
-    
     def __str__(self):
         return self.film_name
 
