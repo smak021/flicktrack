@@ -74,7 +74,7 @@ def film_details(request, showid, showdate, filmid):
 def film_list(request):
 
     if request.method == 'GET':
-        filmdata = film_det.objects.all()
+        filmdata = film_det.objects.all().order_by('-release_date')
         serializer = filmserializer(filmdata, many=True)
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'POST':
@@ -140,7 +140,8 @@ def loc_det(request):
 @csrf_exempt
 def single_film_list(request, filmid):
     if request.method == 'GET':
-        ftdata = ft_data.objects.filter(film_id__exact=filmid)
+        ftdata = ft_data.objects.filter(film_id__exact=filmid).order_by('show_date')
+        print(ftdata)
         serializer = dataserializer(ftdata, many=True)
         return JsonResponse(serializer.data, safe=False)
 
@@ -148,5 +149,6 @@ def single_film_list(request, filmid):
 def get_single_film_list(request, filmid):
     if request.method == 'GET':
         ftdata = film_det.objects.filter(film_id__exact=filmid)
+        
         serializer = filmserializer(ftdata, many=True)
         return JsonResponse(serializer.data, safe=False)

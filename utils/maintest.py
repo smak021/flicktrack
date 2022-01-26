@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from email import header
+from unicodedata import category
 import requests
 import json
 from datetime import date
@@ -52,6 +53,8 @@ def main_data(film_namee,Sh_tm, fm_loc):
             available_seat = available_seat + int(urll['AvailableSeats'])
             show_date=urll['ShowDateCode']
             price = urll['Price']
+            category_name= urll['CategoryName']
+            screen_name = urll['ScreenName']
             
         booked_seat = int(total_seat)-int(available_seat)
         Current_date = date.today()
@@ -73,7 +76,7 @@ def main_data(film_namee,Sh_tm, fm_loc):
             pass
         else:
             
-            filmdata={"film_name": film_namee, "film_id": show_id, "theatre_id": venue, "show_id": session, "available_seat": available_seat, "total_seat": total_seat, "booked_seat": booked_seat, "Show_time": show_time, "show_date": show_date, "price":price ,"film_loc":fm_loc , "last_modified": cur_time}
+            filmdata={"film_name": film_namee, "film_id": show_id,"screen_name":screen_name,"category_name":category_name ,"theatre_id": venue, "show_id": session, "available_seat": available_seat, "total_seat": total_seat, "booked_seat": booked_seat, "Show_time": show_time, "show_date": show_date, "price":price ,"film_loc":fm_loc , "last_modified": cur_time}
             filmdata_json = json.dumps(filmdata)
             r= requests.put('http://127.0.0.1:8000/gufilm/'+session+'/'+show_date+'/'+show_id+'/', json=filmdata, headers={'Content-type': 'application/json'})
             #r= requests.post('http://127.0.0.1:8000/getdata/', json=filmdata, headers={'Content-type': 'application/json'})
