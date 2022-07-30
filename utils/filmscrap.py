@@ -2,10 +2,12 @@ import requests
 import json
 import pytz
 
-uu= requests.get('http://127.0.0.1:8000/getlocdata/').text
+uu= requests.get('http://127.0.0.1:8000/api/tracks/').text
 json_data=json.loads(uu)
 for fmlo in json_data:
-    payload='{"bmsId":"1.760661160.1633786977283","regionCode":"'+fmlo['film_location']+'","isSuperstar":"N"}'
+    loc = fmlo['track_location']
+    payload='{"bmsId":"1.760661160.1633786977283","regionCode":"'+loc+'","isSuperstar":"N"}'
+    print(payload)
     url = requests.post('https://in.bookmyshow.com/pwa/api/uapi/movies',data=payload ,headers={'content-type':'application/json'}).text
     url_json = json.loads(url)
     substring = 'bookmyshow.com'
@@ -24,8 +26,8 @@ for fmlo in json_data:
         if film_story!= None and substring in film_story:
             film_story='Not Available'
         print(film_loc)
-        payload1={"film_name": film_name,"film_length":film_length,"film_genre":film_genre,"film_story":film_story,"film_censor":film_censor,"film_real_name":film_real_name, "film_id": film_id, "release_date": release_date, "image_url":image_url, "film_loc":film_loc}
+        payload1={"film_id":film_id,"film_name": film_name, "cover_url":image_url, "release_date": release_date,"film_story":film_story,"film_genre":film_genre,"film_censor":film_censor,"film_duration":film_length}
         payload1_json = json.dumps(payload1)
-        url1=requests.put('http://127.0.0.1:8000/getfilmdata/'+film_id+'/'+film_loc+'/', json=payload1, headers={'Content-type': 'application/json'})
-        print(url1.text)
+        url1=requests.put('http://127.0.0.1:8000/api/putfilm/'+film_id+'/', json=payload1, headers={'Content-type': 'application/json'})
+        #print(url1.text)
 

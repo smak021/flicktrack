@@ -1,14 +1,22 @@
+import imp
 from django.contrib import admin
 from django.urls import path, include
-from api.views import film_details,get_single_film_list, home_pg, track_list, film_list, put_film_list,loc_det,single_film_list
+#from api.views import get_location,film_details,get_single_film_list, home_pg, track_list, film_list, put_film_list,loc_det,single_film_list
+#from api.views import track,loc_det
+from api.views import films, tracks, shows, filmlist, putShow,ReportApi
+# from api.views import ReportApi,getMainData,theatreList, filmSingle, filmData, mainData, films, filmlist, shows, showTheatre
 
 urlpatterns = [
-    path('', home_pg),
-    path('getdata/', track_list ),
-    path('getfilmdata/', film_list),
-    path('getlocdata/', loc_det),
-    path('getfilmdata/<str:filmid>/<filmloc>/', put_film_list),
-    path('getfilmdata/<str:filmid>/', get_single_film_list),
-    path('getdata/<str:filmid>/', single_film_list),
-    path('gufilm/<str:showid>/<str:showdate>/<str:filmid>/', film_details ),
+  # path('theatres/',theatreList),
+  # path('getfilm/<str:filmid>/',filmSingle),
+  # path('data/',filmData),
+  # path('complete/',mainData),
+  # path('complete/<str:filmid>',getMainData),
+  path('putshow/<str:showid>/<str:categoryname>/',putShow),
+  path('films/',films),
+  path('putfilm/<str:filmid>/',filmlist),
+  path('shows/',shows),
+  path('tracks/',tracks),
+  # path('theatrenshows/',showTheatre),
+  path('data/<pk>/',ReportApi.as_view())
 ]

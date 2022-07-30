@@ -1,13 +1,20 @@
+import imp
+from re import T
+import re
 from django.shortcuts import render
-from rest_framework import status
+from pkg_resources import safe_extra
+from rest_framework import status,generics
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse, response
 import requests
 from rest_framework.parsers import JSONParser
 from rest_framework.serializers import Serializer
-from .models import ft_data, film_det, film_loc
+from django.core import serializers
+# from .models import ft_data, film_det, film_loc
 from django.views.decorators.csrf import csrf_exempt
-from .serializers import dataserializer,filmserializer,filmlocserializer
+#from .serializers import dataserializer,filmserializer,filmlocserializer
+from .models import show, track, film 
+from .serializers import showserializer, filmserializer, trackserializer,dataserializer
 
 
 # Create your views here.
@@ -16,84 +23,262 @@ from .serializers import dataserializer,filmserializer,filmlocserializer
 def home_pg(self):
     return HttpResponse('<h2>Hello</h2>')
 
+# #REBUILD
+# # Theatre GET & PUT
+# @csrf_exempt
+# def theatreList(request):
+#     if request.method == 'GET':
+#         location_data = theatre.objects.all()
+#         serializer = theatreserializer(location_data, many = True)
+#         return JsonResponse(serializer.data, safe=False)
+#     elif request.method == 'PUT':
+#         putData = JSONParser().parse(request)
+#         serializer = theatreserializer(data=putData)
+
+#     if serializer.is_valid():
+#         serializer.save()
+#         return JsonResponse(serializer.data)
+
+# # Single Film GET only
+# @csrf_exempt
+# def filmSingle(request,filmid):
+#     if request.method == 'GET':
+#         filmData =  film.objects.filter(film_id__exact = filmid)
+#         serializer = filmserializer(filmData, many=True)
+#         return JsonResponse(serializer.data, safe=False)
+
+#     if serializer.is_valid():
+#         serializer.save()
+#     return JsonResponse(serializer.data)
+
+# # Data Table GET & PUT
+# @csrf_exempt
+# def filmData(request):
+#     if request.method == 'GET':
+#         filmData = data.objects.all()
+#         serializer = dataNserializer(filmData, many=True)
+#         return JsonResponse(serializer.data, safe=False)
+#     elif request.method == 'PUT':
+#         putData = JSONParser().parse(request)
+#         serializer = dataNserializer(data=putData)
+ 
+#     if serializer.is_valid():
+#         serializer.save()
+#         return JsonResponse(serializer.data)
+#     return JsonResponse(serializer.errors)
+
+
+# # important: Main data linked with different tables only GET , PUT not working since connected
+# @csrf_exempt
+# def mainData(request):
+#     dataa = data.objects.select_related('show')
+#     if request.method == 'GET':
+#         serializer = dataserializer(dataa, many=True)
+#         return JsonResponse(serializer.data, safe=False)
+
+#     if serializer.is_valid():
+#         serializer.save()
+#         return JsonResponse(serializer.data)
+#     return JsonResponse(serializer.errors)
+
+# #TESTING, Remove later
+# class ReportApi(generics.RetrieveAPIView):
+#     serializer_class = testserializer
+#     queryset = film.objects.all()
+
+# #Trying to read complete data with film ID
+# @csrf_exempt
+# def getMainData(request,filmid):
+#     if request.method == 'GET':
+#         gData = data.objects.filter(show_id__exact = filmid)
+#         serializer = dataserializer(gData, many = True)
+#         return JsonResponse(serializer.data, safe=False)
+
+#     if serializer.is_valid():
+#         serializer.save()
+#         return JsonResponse(serializer.data)
+#     return JsonResponse(serializer.errors)
+
+
+# # Films GET & PUT
+# @csrf_exempt
+# def films(request):
+#     if request.method == 'GET':
+#         filmdata = film.objects.all().order_by('-release_date')
+#         serializer = filmserializer(filmdata, many=True)
+#         return JsonResponse(serializer.data, safe=False)
+#     elif request.method == 'PUT':
+#         putData = JSONParser().parse(request)
+#         serializer = filmserializer(data=putData)
+
+#         if serializer.is_valid():
+#             serializer.save()
+#             return JsonResponse(serializer.data)
+#         return JsonResponse(serializer.errors)
+
+# # Put film using film ID provided by BMS
+# @csrf_exempt
+# def filmlist(request,filmid):
+#     try:
+#         film_data = film.objects.get(film_id__exact=filmid)
+#     except film.DoesNotExist:
+#         if request.method == 'PUT':
+#             putData = JSONParser().parse(request)
+#             serializer = filmserializer(data=putData)
+
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return JsonResponse(serializer.data)
+#             return JsonResponse(serializer.errors)
+
+#         elif request.method == 'GET':
+#             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+#     if request.method == 'GET':
+#         serializer = filmserializer(film_data)
+#         return JsonResponse(serializer.data)
+
+#     elif request.method == 'PUT':
+#         pdata = JSONParser().parse(request)
+#         serializer = filmserializer(film_data, data=pdata)
+
+#         if serializer.is_valid():
+#             serializer.save()
+#             return JsonResponse(serializer.data)
+#         return JsonResponse(serializer.errors)
+
+#     elif request.method == 'DELETE':
+#         film_data.delete()
+#         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
+
+# # shows Get & put 
+# @csrf_exempt
+# def shows(request):
+#     if request.method == 'GET':
+#         showData = show.objects.all()
+#         serializer = showNserializer(showData, many=True,context = {'isConnect':0})
+#         return JsonResponse(serializer.data, safe=False)
+#     elif request.method == 'PUT':
+#         putData = JSONParser().parse(request)
+#         serializer = showNserializer(data=putData)
+
+#         if serializer.is_valid():
+#             serializer.save()
+#             return JsonResponse(serializer.data)
+#         return JsonResponse(serializer.errors)
+
+# #showTheatre get & put
+# @csrf_exempt
+# def showTheatre(request):
+#     if request.method == 'GET':
+#         showTheatreData = show_theatre.objects.all()
+#         serializer = showtheatreNserializer(showTheatreData, many=True)
+#         return JsonResponse(serializer.data, safe=False)
+#     elif request.method == 'PUT':
+#         putData = JSONParser().parse(request)
+#         serializer = showtheatreNserializer(data=putData)
+
+#         if serializer.is_valid():
+#             serializer.save()
+#             return JsonResponse(serializer.data)
+#         return JsonResponse(serializer.errors)
+
+#New 30/7/2022
 
 
 @csrf_exempt
-def track_list(request):
-
+def films(request):
     if request.method == 'GET':
-        ftdata = ft_data.objects.all()
-        serializer = dataserializer(ftdata, many=True)
-        return JsonResponse(serializer.data, safe=False)
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = dataserializer(data=data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors)
-
-@csrf_exempt
-def film_details(request, showid, showdate, filmid):
-    try:
-        #ftdata = ft_data.objects.get(pk=pk)
-        ftdata = ft_data.objects.get(show_id__exact=showid, show_date__exact=showdate, film_id__exact=filmid)
-        print("Hello")
-    except ft_data.DoesNotExist:
-        if request.method == 'PUT':
-            data = JSONParser().parse(request)
-            serializer = dataserializer(data=data)
-
-            if serializer.is_valid():
-                serializer.save()
-                return JsonResponse(serializer.data)
-            return JsonResponse(serializer.errors)
-
-        elif request.method == 'GET':
-            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = dataserializer(ftdata)
-        return JsonResponse(serializer.data)
-
-    elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = dataserializer(ftdata, data=data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors)
-
-    elif request.method == 'DELETE':
-        ftdata.delete()
-        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
-
-@csrf_exempt
-def film_list(request):
-
-    if request.method == 'GET':
-        filmdata = film_det.objects.all().order_by('-release_date')
+        filmdata = film.objects.all()
         serializer = filmserializer(filmdata, many=True)
         return JsonResponse(serializer.data, safe=False)
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = filmserializer(data=data)
+    elif request.method == 'PUT':
+        putData = JSONParser().parse(request)
+        serializer = filmserializer(data=putData)
 
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data)
         return JsonResponse(serializer.errors)
 
+
 @csrf_exempt
-def put_film_list(request, filmid, filmloc):
+def shows(request):
+    if request.method == 'GET':
+        showData = show.objects.all()
+        serializer = showserializer(showData , many = True)
+        return JsonResponse(serializer.data, safe=False)
+    elif request.method == 'PUT':
+        putData = JSONParser().parse(request)
+        serializer = showserializer(data=putData)
+
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors)
+
+
+@csrf_exempt
+def tracks(request):
+    if request.method == 'GET':
+        trackData = track.objects.all()
+        serializer = trackserializer(trackData , many = True)
+        return JsonResponse(serializer.data, safe=False)
+    elif request.method == 'PUT':
+        putData = JSONParser().parse(request)
+        serializer = trackserializer(data=putData)
+
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors)
+
+
+@csrf_exempt
+def putShow(request, showid, categoryname):
     try:
-        pfilmdata = film_det.objects.get(film_id__exact=filmid, film_loc__exact=filmloc)
-    except film_det.DoesNotExist:
+        showData = show.objects.get(show_id__exact = showid, category_name__exact = categoryname)
+    except show.DoesNotExist:
         if request.method == 'PUT':
-            data = JSONParser().parse(request)
-            serializer = filmserializer(data=data)
+            putData = JSONParser().parse(request)
+            serializer = showserializer(data= putData)
+
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data)
+            return JsonResponse(serializer.errors)
+
+        elif request.method == 'GET':
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)   
+    
+    if request.method == 'GET':
+        serializer = showserializer(showData)
+        return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        pdata = JSONParser().parse(request)
+        serializer = showserializer(showData, data=pdata)
+
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors)
+
+    elif request.method == 'DELETE':
+        showData.delete()
+        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
+
+
+
+# Put film using film ID provided by BMS
+@csrf_exempt
+def filmlist(request,filmid):
+    try:
+        film_data = film.objects.get(film_id__exact=filmid)
+    except film.DoesNotExist:
+        if request.method == 'PUT':
+            putData = JSONParser().parse(request)
+            serializer = filmserializer(data=putData)
 
             if serializer.is_valid():
                 serializer.save()
@@ -102,14 +287,14 @@ def put_film_list(request, filmid, filmloc):
 
         elif request.method == 'GET':
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
-    
+
     if request.method == 'GET':
-        serializer = filmserializer(pfilmdata)
+        serializer = filmserializer(film_data)
         return JsonResponse(serializer.data)
 
     elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = filmserializer(pfilmdata, data=data)
+        pdata = JSONParser().parse(request)
+        serializer = filmserializer(film_data, data=pdata)
 
         if serializer.is_valid():
             serializer.save()
@@ -117,38 +302,10 @@ def put_film_list(request, filmid, filmloc):
         return JsonResponse(serializer.errors)
 
     elif request.method == 'DELETE':
-        pfilmdata.delete()
+        film_data.delete()
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
-@csrf_exempt
-def loc_det(request):
 
-    if request.method == 'GET':
-        ftdata = film_loc.objects.all()
-        serializer = filmlocserializer(ftdata, many=True)
-        return JsonResponse(serializer.data, safe=False)
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = filmlocserializer(data=data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors)
-
-
-@csrf_exempt
-def single_film_list(request, filmid):
-    if request.method == 'GET':
-        ftdata = ft_data.objects.filter(film_id__exact=filmid).order_by('show_date')
-        print(ftdata)
-        serializer = dataserializer(ftdata, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
-@csrf_exempt
-def get_single_film_list(request, filmid):
-    if request.method == 'GET':
-        ftdata = film_det.objects.filter(film_id__exact=filmid)
-        
-        serializer = filmserializer(ftdata, many=True)
-        return JsonResponse(serializer.data, safe=False)
+class ReportApi(generics.RetrieveAPIView):
+    serializer_class = dataserializer
+    queryset = film.objects.all()
