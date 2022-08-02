@@ -2,7 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 
-uu= requests.get('http://127.0.0.1:8000/api/tracks/').text
+uu= requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
 json_data=json.loads(uu)
 for fmlo in json_data:
     loc = fmlo['track_location']
@@ -63,7 +63,7 @@ for fmlo in json_data:
         payload1={"film_id":film_id,"film_name": film_name, "cover_url":image_url, "release_date": release_date,"film_story":film_story,"film_genre":film_genre,"film_censor":film_censor,"film_duration":film_length,"full_name":film_real_name,"cast_n_crew":jsoncastncrew}
         payload2 = {"film_id":film_id,"is_tracking":True}
         payload1_json = json.dumps(payload1)
-        url1=requests.put('http://127.0.0.1:8000/api/putfilm/'+film_id+'/', json=payload1, headers={'Content-type': 'application/json'})
-        url2 = requests.put('http://127.0.0.1:8000/api/status/',json=payload2,headers={'Content-type': 'application/json'})
+        url1=requests.put('http://flicktracks.herokuapp.com/api/putfilm/'+film_id+'/', json=payload1, headers={'Content-type': 'application/json'})
+        url2 = requests.put('http://flicktracks.herokuapp.com/api/status/',json=payload2,headers={'Content-type': 'application/json'})
         #print(url1.text)
 
