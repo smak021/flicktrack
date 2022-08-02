@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-9pn54h0s1v*lzcdyax*%^szwox##pqbjnp8#3bg^v=_2%-as^x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['flicktracks.herokuapp.com/','localhost']
+ALLOWED_HOSTS = ['flicktracks.herokuapp.com','localhost']
 
 
 # Application definition
