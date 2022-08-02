@@ -1,7 +1,6 @@
 from cgi import print_exception
 from pickle import TRUE
 from pyexpat import model
-from tkinter import CASCADE
 from unicodedata import category
 from django.db import models
 # Create your models here.
