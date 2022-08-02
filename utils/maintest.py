@@ -27,7 +27,6 @@ def main_data(film_namee,film_ID, fm_loc):
     tz_NY = pytz.timezone('Asia/Kolkata')   
     datetime_NY = datetime.now(tz_NY)
     d1 = datetime_NY.strftime('%Y%m%d')
-    #for x in myresult:
     website = 'https://in.bookmyshow.com/buytickets/'+film_namee+'-'+loc_slug+'/movie-'+fm_loc.lower()+'-'+film_ID+'-MT/'+d1
     page = requests.get(website)
     soup = BeautifulSoup(page.content, "html.parser")
@@ -37,6 +36,9 @@ def main_data(film_namee,film_ID, fm_loc):
         venue = values['data-venue-code']
         show_time = values['data-display-showtime']
         show_id = values['data-event-id']
+        venue_url=requests.get("https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode=ATTR").text
+        vjson = json.loads(venue_url)
+        theatre_name = vjson['data']['venueName']
         print(film_namee)
         print(venue)
         print(session)
@@ -61,7 +63,8 @@ def main_data(film_namee,film_ID, fm_loc):
             Current_date = date.today()
             d1 = Current_date.strftime('%Y%m%d')
             #print(d1)
-            print('Show ID:',show_id)
+            print('Film ID:',show_id)
+            print("Show ID",session)
             print('Show Time:',show_time)
             print('Show Date:',show_date)
             print('Total Seats:', total_seat)
@@ -73,30 +76,11 @@ def main_data(film_namee,film_ID, fm_loc):
             show_spt_time=timesplit(show_time)
             add_cur_time=datetime.strptime(cur_time,'%I:%M %p') + timedelta(minutes=30)
             new_cur_time=add_cur_time.strftime('%I:%M %p')
-            # if cur_spt_time[2]==show_spt_time[2] and new_cur_time>show_time:
-            #     pass
-            # else:
-            # Tables Json
-            print("hello")
-            print(session)
             datta =  {"show_id": session,"show_time": show_time,"screen_name": screen_name,"show_date": show_date,"category_name": category_name,"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"theatre_code": venue,"theatre_location": fm_loc,"last_modified": cur_time,"film": show_id}
-            # jData = {"price": price,"booked_seats": booked_seat, "available_seats": available_seat, "total_seats": total_seat, "last_modified": cur_time,"show": session}
-            # jTheatre ={"theatre_id": venue,"theatre_location":fm_loc,"is_currently_tracking":"N"}
-            # jShows={"show_id":session, "show_time": show_time, "screen_name": screen_name,"show_category_name":category_name ,"show_date": show_date,"is_blocked_covidseat":"N", "is_covidtime":"N", "film":show_id}
-            # jShowTheatre={"show":session,"theatre": venue}
             putt = requests.put('http://127.0.0.1:8000/api/putshow/'+session+'/'+category_name+'/',json=datta, headers={'Content-type': 'application/json'})
-            # dataPut = requests.put('http://127.0.0.1:8000/api/data/',json=jData, headers={'Content-type': 'application/json'})
-            print(putt.status_code)
+            print("Status Code:",putt.status_code)
             print("-------------------------------")
-            # theatrePut = requests.put('http://127.0.0.1:8000/api/theatres/',json=jTheatre, headers={'Content-type': 'application/json'})
-            # showPut = requests.put('http://127.0.0.1:8000/api/shows/',json=jShows, headers={'Content-type': 'application/json'})
-            # showTheatrePut = requests.put('http://127.0.0.1:8000/api/theatrenshows/',json=jShowTheatre, headers={'Content-type': 'application/json'})
-            # dataaa = { "show": { "show_id": { "film": show_id,    }}, "show_id": show_id,  }
-            #filmdata={"film_name": film_namee, "film_id": show_id,"screen_name":screen_name,"category_name":category_name ,"theatre_id": venue, "show_id": session, "available_seat": available_seat, "total_seat": total_seat, "booked_seat": booked_seat, "Show_time": show_time, "show_date": show_date, "price":price ,"film_loc":fm_loc , "last_modified": cur_time}
-            #filmdata_json = json.dumps(filmdata)
-            #r= requests.put('http://127.0.0.1:8000/api/test/', json=dataaa, headers={'Content-type': 'application/json'})    
-            #r= requests.post('http://127.0.0.1:8000/getdata/', json=filmdata, headers={'Content-type': 'application/json'})
-        
+            
 
 film_data= requests.get('http://127.0.0.1:8000/api/films/').text
 film_data_json = json.loads(film_data)

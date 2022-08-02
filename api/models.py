@@ -1,4 +1,5 @@
 from cgi import print_exception
+from pickle import TRUE
 from pyexpat import model
 from tkinter import CASCADE
 from unicodedata import category
@@ -7,15 +8,25 @@ import sched
 # Create your models here.
 #New Simple Table
 
+
 class film(models.Model):
     film_id = models.CharField(max_length=50, primary_key=True)
     film_name = models.CharField(max_length=100)
     cover_url = models.CharField(max_length=500)        
     release_date = models.CharField(max_length=50)
-    film_story = models.CharField(max_length=1500)
+    film_story = models.CharField(max_length=2000)
     film_genre = models.CharField(max_length=50)
     film_censor = models.CharField(max_length=50)
     film_duration = models.CharField(max_length=50)
+    full_name = models.CharField(max_length=50)
+    cast_n_crew = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return self.film_id
+
+class status(models.Model):
+    film = models.OneToOneField(film,on_delete=models.CASCADE,primary_key=TRUE)
+    is_tracking = models.BooleanField(default=True)
 
     def __str__(self):
         return self.film_id

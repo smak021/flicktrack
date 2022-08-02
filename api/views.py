@@ -13,8 +13,8 @@ from django.core import serializers
 # from .models import ft_data, film_det, film_loc
 from django.views.decorators.csrf import csrf_exempt
 #from .serializers import dataserializer,filmserializer,filmlocserializer
-from .models import show, track, film 
-from .serializers import showserializer, filmserializer, trackserializer,dataserializer
+from .models import show, track, film,status 
+from .serializers import showserializer, filmserializer, trackserializer,dataserializer,statusserializer
 
 
 # Create your views here.
@@ -189,7 +189,7 @@ def home_pg(self):
 @csrf_exempt
 def films(request):
     if request.method == 'GET':
-        filmdata = film.objects.all()
+        filmdata = film.objects.all().order_by('-release_date')
         serializer = filmserializer(filmdata, many=True)
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'PUT':
@@ -217,6 +217,21 @@ def shows(request):
             return JsonResponse(serializer.data)
         return JsonResponse(serializer.errors)
 
+
+@csrf_exempt
+def statuss(request):
+    if request.method == 'GET':
+        statusData = status.objects.all()
+        serializer = statusserializer(statusData , many = True)
+        return JsonResponse(serializer.data, safe=False)
+    elif request.method == 'PUT':
+        putData = JSONParser().parse(request)
+        serializer = statusserializer(data=putData)
+
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors)
 
 @csrf_exempt
 def tracks(request):

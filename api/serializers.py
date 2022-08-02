@@ -4,7 +4,7 @@ from enum import unique
 from attr import field
 from rest_framework import serializers
 # from .models import ft_data,film_det,film_loc
-from .models import film,show,track
+from .models import film,show,track,status
 from drf_writable_nested import WritableNestedModelSerializer
 
 # New 30/7/2022
@@ -13,7 +13,7 @@ class filmserializer(serializers.ModelSerializer):
 
     class Meta:
         model = film
-        fields = ['film_id', 'film_name', 'cover_url', 'release_date', 'film_story', 'film_genre', 'film_censor', 'film_duration']
+        fields = '__all__'
 
 class showserializer(serializers.ModelSerializer):
 
@@ -27,7 +27,12 @@ class showserializer(serializers.ModelSerializer):
         article_instance = show.objects.create(**validated_data, film=tag_instance)
         return article_instance
 
-    
+
+class statusserializer(serializers.ModelSerializer):
+    film = filmserializer(many = False)
+    class Meta:
+        model = status 
+        fields = '__all__'    
 
 class trackserializer(serializers.ModelSerializer):
 
