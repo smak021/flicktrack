@@ -1,12 +1,9 @@
 from datetime import datetime, timedelta
-from email import header
 from unicodedata import category
 import requests
 import json
 from datetime import date
 from bs4 import BeautifulSoup
-from selenium.webdriver.common.keys import Keys
-import time
 import pytz
 # from api.views import mainData
 

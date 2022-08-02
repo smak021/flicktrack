@@ -4,7 +4,6 @@ from pyexpat import model
 from tkinter import CASCADE
 from unicodedata import category
 from django.db import models
-import sched
 # Create your models here.
 #New Simple Table
 

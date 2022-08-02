@@ -5,7 +5,6 @@ from attr import field
 from rest_framework import serializers
 # from .models import ft_data,film_det,film_loc
 from .models import film,show,track,status
-from drf_writable_nested import WritableNestedModelSerializer
 
 # New 30/7/2022
 

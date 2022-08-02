@@ -1,6 +1,5 @@
 import requests
 import json
-import pytz
 from bs4 import BeautifulSoup
 
 uu= requests.get('http://127.0.0.1:8000/api/tracks/').text
@@ -9,6 +8,7 @@ for fmlo in json_data:
     loc = fmlo['track_location']
     payload='{"bmsId":"1.760661160.1633786977283","regionCode":"'+loc+'","isSuperstar":"N"}'
     print(payload)
+    requests.adapters.DEFAULT_RETRIES = 5
     url = requests.post('https://in.bookmyshow.com/pwa/api/uapi/movies',data=payload ,headers={'content-type':'application/json'}).text 
     url_json = json.loads(url)
     substring = 'bookmyshow.com'

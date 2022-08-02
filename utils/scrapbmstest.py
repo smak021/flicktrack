@@ -1,4 +1,3 @@
-from array import array
 import json
 from bs4 import BeautifulSoup
 import requests
