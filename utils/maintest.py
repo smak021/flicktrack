@@ -16,7 +16,7 @@ def timesplit(time):
 
 
 def main_data(film_namee,film_ID, fm_loc):
-    uu= requests.get('http://127.0.0.1:8000/api/tracks/').text
+    uu= requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
     json_data=json.loads(uu)
     for fmlo in json_data:
         if fmlo['track_location'] == fm_loc:
@@ -74,14 +74,14 @@ def main_data(film_namee,film_ID, fm_loc):
             add_cur_time=datetime.strptime(cur_time,'%I:%M %p') + timedelta(minutes=30)
             new_cur_time=add_cur_time.strftime('%I:%M %p')
             datta =  {"show_id": session,"show_time": show_time,"screen_name": screen_name,"show_date": show_date,"category_name": category_name,"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"theatre_code": venue,"theatre_location": fm_loc,"last_modified": cur_time,"film": show_id}
-            putt = requests.put('http://127.0.0.1:8000/api/putshow/'+session+'/'+category_name+'/',json=datta, headers={'Content-type': 'application/json'})
+            putt = requests.put('http://flicktracks.herokuapp.com/api/putshow/'+session+'/'+category_name+'/',json=datta, headers={'Content-type': 'application/json'})
             print("Status Code:",putt.status_code)
             print("-------------------------------")
             
 
-film_data= requests.get('http://127.0.0.1:8000/api/films/').text
+film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
 film_data_json = json.loads(film_data)
-locData = requests.get('http://127.0.0.1:8000/api/tracks/').text
+locData = requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
 locData_json = json.loads(locData)
 # print(locData_json)
 for film in film_data_json:
