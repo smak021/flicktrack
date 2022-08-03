@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 from pathlib import Path
+import dj_database_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
@@ -88,6 +90,7 @@ WSGI_APPLICATION = 'fliptrack.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# MySQL
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'mysql.connector.django',
@@ -98,22 +101,15 @@ WSGI_APPLICATION = 'fliptrack.wsgi.application'
 #         'PORT': '3306',
 #     }
 # }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+# SQLite
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'flick_track',
-        'USER': 'smak_ft',
-        'PASSWORD': 'sfmak-123?',
-        'HOST': 'database-1.csjd7x8pr0tx.ap-south-1.rds.amazonaws.com',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
 
 
 # Password validation
@@ -156,3 +152,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
