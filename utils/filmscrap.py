@@ -33,8 +33,11 @@ for fmlo in json_data:
         actors=[]
         crew=[]
         ccquery = html.find("section",id="component-4")
-        classname =  ccquery.a['class'][0]
-        readquery = html.find_all("a",class_=classname)
+        try:
+            classname =  ccquery.a['class'][0]
+            readquery = html.find_all("a",class_=classname)
+        except AttributeError:
+            readquery = None
         # acount =0
         # ccount =0
         if readquery != None:
