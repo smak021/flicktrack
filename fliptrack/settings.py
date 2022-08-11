@@ -67,11 +67,12 @@ MIDDLEWARE = [
 #   'http://flicktracks.web.app'
 # )
 CORS_ALLOWED_ORIGINS = [
-     "localhost:4200",
+     "http://localhost:4200",
   "https://flicktracks.web.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:4200",
     "https://flicktracks.web.app",
 ]
 

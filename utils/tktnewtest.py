@@ -1,7 +1,9 @@
 import json
+import string
 from turtle import ht
 from bs4 import BeautifulSoup
 import requests
+import ast
 
 # Ticket New
 
@@ -17,11 +19,14 @@ for val in query:
         try:
             print(val2.a["data-venuen"])
             print(val2.a["data-tkts"])
+            jss =str(val2.a["data-tkts"])
+            dictt = json.loads(jss)
+            print(dictt[0]["Total"])
+            print(dictt[0]["Avail"])
+            
         except AttributeError:
             print("Not found")
     # print(val.ul.li.a)
-
-
 
 # venue_url=requests.get("https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode=ATTR").text
 # vjson = json.loads(venue_url)
