@@ -60,14 +60,20 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-CORS_ORIGIN_ALLOW_ALL = False
+# CORS_ORIGIN_ALLOW_ALL = False
 
-CORS_ORIGIN_WHITELIST = (
-  'http://localhost:8000',
-  'http://flicktracks.web.app'
-)
+# CORS_ORIGIN_WHITELIST = (
+#   'http://localhost:8000',
+#   'http://flicktracks.web.app'
+# )
+CORS_ALLOWED_ORIGINS = [
+     "http://localhost:8000",
+  "http://flicktracks.web.app",
+]
 
-
+CSRF_TRUSTED_ORIGINS = [
+    "http://flicktracks.web.app",
+]
 
 ROOT_URLCONF = 'fliptrack.urls'
 
