@@ -1,11 +1,31 @@
 import json
+from turtle import ht
 from bs4 import BeautifulSoup
 import requests
 
+# Ticket New
 
-venue_url=requests.get("https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode=ATTR").text
-vjson = json.loads(venue_url)
-print(vjson['data']['venueName'])
+tktnewUrl = "https://www.ticketnew.com/Nna-Thaan-Case-Kodu--Movie-Tickets-Online-Show-Timings/Online-Advance-Booking/25382/C/Calicut"
+
+requ = requests.get(tktnewUrl)
+html = BeautifulSoup(requ.content,"html.parser")
+query = html.find_all("div",class_="tn-timing-details")
+for val in query:
+    for val2 in val.ul:
+        # print(val2.li.a["data-venuen"])
+        # print(val2.li.a["data-tkts"])
+        try:
+            print(val2.a["data-venuen"])
+            print(val2.a["data-tkts"])
+        except AttributeError:
+            print("Not found")
+    # print(val.ul.li.a)
+
+
+
+# venue_url=requests.get("https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode=ATTR").text
+# vjson = json.loads(venue_url)
+# print(vjson['data']['venueName'])
 
 
 # url = requests.get("https://in.bookmyshow.com/kozhikode/movies/kaduva/ET00330368")
