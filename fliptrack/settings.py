@@ -68,11 +68,11 @@ MIDDLEWARE = [
 # )
 CORS_ALLOWED_ORIGINS = [
      "http://localhost:8000",
-  "http://flicktracks.web.app",
+  "https://flicktracks.web.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://flicktracks.web.app",
+    "https://flicktracks.web.app",
 ]
 
 ROOT_URLCONF = 'fliptrack.urls'
