@@ -33,9 +33,9 @@ def main_data(film_namee,film_ID, fm_loc):
         venue = values['data-venue-code']
         show_time = values['data-display-showtime']
         show_id = values['data-event-id']
-        venue_url=requests.get("https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode=ATTR").text
-        vjson = json.loads(venue_url)
-        theatre_name = vjson['data']['venueName']
+        # venue_url=requests.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
+        # vjson = json.loads(venue_url)
+        # theatre_name = vjson['data']['venueName']
         print(film_namee)
         print(venue)
         print(session)
