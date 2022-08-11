@@ -119,18 +119,30 @@ WSGI_APPLICATION = 'fliptrack.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'dbf520k9fqhp08',
+#         'USER': 'bwjkxscugfmegj',
+#         'PASSWORD': 'e32fe83dbb420a3ef9a6dc648a86a6af000a1a8ed236708542df4c73f7eceda5',
+#         'HOST': 'ec2-99-81-137-11.eu-west-1.compute.amazonaws.com',
+#         'PORT': '5432',
+#         'OPTIONS': {'sslmode': 'require'},
+#     },
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dbf520k9fqhp08',
-        'USER': 'bwjkxscugfmegj',
-        'PASSWORD': 'e32fe83dbb420a3ef9a6dc648a86a6af000a1a8ed236708542df4c73f7eceda5',
-        'HOST': 'ec2-99-81-137-11.eu-west-1.compute.amazonaws.com',
-        'PORT': '5432',
-        'OPTIONS': {'sslmode': 'require'},
-    },
+        'NAME': os.environ.get('DATABASE_NAME'),
+        'USER': os.environ.get('DATABASE_USER'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
+        'HOST': os.environ.get('DATABASE_HOST'),
+        'PORT': '5432'
+    }
 }
 
+db_from_env = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation
@@ -174,4 +186,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+# DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
