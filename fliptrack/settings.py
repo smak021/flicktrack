@@ -67,7 +67,7 @@ MIDDLEWARE = [
 #   'http://flicktracks.web.app'
 # )
 CORS_ALLOWED_ORIGINS = [
-     "http://localhost:8000",
+     "localhost:4200",
   "https://flicktracks.web.app",
 ]
 
