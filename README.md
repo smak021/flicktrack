@@ -1,2 +1,2 @@
-# scrap
-scrap BMS
+# scrape
+scrape BMS
