@@ -47,7 +47,7 @@ class dataserializer(serializers.ModelSerializer):
         fields = '__all__' 
 
     def get_show(self,obj):
-        shows = show.objects.filter(film_id = obj.film_id)
+        shows = show.objects.filter(film_id = obj.film_id).order_by('-show_date')
         return showserializer(shows, many = True).data
 
         

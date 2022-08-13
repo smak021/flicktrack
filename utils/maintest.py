@@ -36,6 +36,7 @@ def main_data(film_namee,film_ID, fm_loc):
         # venue_url=requests.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
         # vjson = json.loads(venue_url)
         # theatre_name = vjson['data']['venueName']
+        print("-------------------------------")
         print(film_namee)
         print(venue)
         print(session)
@@ -76,7 +77,7 @@ def main_data(film_namee,film_ID, fm_loc):
             datta =  {"show_id": session,"show_time": show_time,"screen_name": screen_name,"show_date": show_date,"category_name": category_name,"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"theatre_code": venue,"theatre_location": fm_loc,"last_modified": cur_time,"film": show_id}
             putt = requests.put('http://flicktracks.herokuapp.com/api/putshow/'+session+'/'+category_name+'/',json=datta, headers={'Content-type': 'application/json'})
             print("Status Code:",putt.status_code)
-            print("-------------------------------")
+           
             
 
 film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
