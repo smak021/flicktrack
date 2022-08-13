@@ -15,12 +15,12 @@ def timesplit(time):
     return [tmhr,tmmin,tmampm]
 
 
-def main_data(film_namee,film_ID, fm_loc):
-    uu= requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
-    json_data=json.loads(uu)
-    for fmlo in json_data:
-        if fmlo['track_location'] == fm_loc:
-            loc_slug=fmlo['loc_real_name']
+def main_data(film_namee,film_ID, fm_loc, loc_slug):
+    # uu= requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
+    # json_data=json.loads(uu)
+    # for fmlo in json_data:
+    #     if fmlo['track_location'] == fm_loc:
+    #         loc_slug=fmlo['loc_real_name']
     tz_NY = pytz.timezone('Asia/Kolkata')   
     datetime_NY = datetime.now(tz_NY)
     d1 = datetime_NY.strftime('%Y%m%d')
@@ -33,9 +33,9 @@ def main_data(film_namee,film_ID, fm_loc):
         venue = values['data-venue-code']
         show_time = values['data-display-showtime']
         show_id = values['data-event-id']
-        # venue_url=requests.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
-        # vjson = json.loads(venue_url)
-        # theatre_name = vjson['data']['venueName']
+        venue_url=requests.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
+        vjson = json.loads(venue_url)
+        theatre_name = vjson['data']['venueName']
         print("-------------------------------")
         print(film_namee)
         print(venue)
@@ -74,7 +74,7 @@ def main_data(film_namee,film_ID, fm_loc):
             show_spt_time=timesplit(show_time)
             add_cur_time=datetime.strptime(cur_time,'%I:%M %p') + timedelta(minutes=30)
             new_cur_time=add_cur_time.strftime('%I:%M %p')
-            datta =  {"show_id": session,"show_time": show_time,"screen_name": screen_name,"show_date": show_date,"category_name": category_name,"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"theatre_code": venue,"theatre_location": fm_loc,"last_modified": cur_time,"film": show_id}
+            datta =  {"show_id": session,"theatre_name":theatre_name,"show_time": show_time,"screen_name": screen_name,"show_date": show_date,"category_name": category_name,"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"theatre_code": venue,"theatre_location": fm_loc,"last_modified": cur_time,"film": show_id}
             putt = requests.put('http://flicktracks.herokuapp.com/api/putshow/'+session+'/'+category_name+'/',json=datta, headers={'Content-type': 'application/json'})
             print("Status Code:",putt.status_code)
            
@@ -87,5 +87,5 @@ locData_json = json.loads(locData)
 # print(locData_json)
 for film in film_data_json:
     for loc in locData_json:
-        main_data(film['film_name'], film['film_id'], loc['track_location'])
+        main_data(film['film_name'], film['film_id'], loc['track_location'], loc['loc_real_name'])
             

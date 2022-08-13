@@ -43,6 +43,7 @@ class show(models.Model):
     film = models.ForeignKey(film,on_delete=models.CASCADE)
     theatre_code = models.CharField(max_length=50)
     theatre_location = models.CharField(max_length=50)
+    theatre_name = models.CharField(max_length=500,default="Not Available")
     last_modified = models.CharField(max_length=50)
 
     def __str__(self):

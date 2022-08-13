@@ -100,35 +100,13 @@ WSGI_APPLICATION = 'fliptrack.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# MySQL
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'mysql.connector.django',
-#         'NAME': 'flicktrack',
-#         'USER': 'root',
-#         'PASSWORD': 'smak',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
+
 # SQLite
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'dbf520k9fqhp08',
-#         'USER': 'bwjkxscugfmegj',
-#         'PASSWORD': 'e32fe83dbb420a3ef9a6dc648a86a6af000a1a8ed236708542df4c73f7eceda5',
-#         'HOST': 'ec2-99-81-137-11.eu-west-1.compute.amazonaws.com',
-#         'PORT': '5432',
-#         'OPTIONS': {'sslmode': 'require'},
-#     },
 # }
 DATABASES = {
     'default': {
