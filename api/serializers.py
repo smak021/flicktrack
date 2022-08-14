@@ -54,7 +54,7 @@ class filmfilterserializer(serializers.ModelSerializer):
 
     class Meta:
         model = film
-        fields = ['film_id','film_name','release_date']
+        fields = ['film_id','film_name','cover_url','full_name','release_date']
 
         
 # #REBUILD 
