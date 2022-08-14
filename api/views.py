@@ -326,6 +326,14 @@ class ReportApi(generics.RetrieveAPIView):
     queryset = film.objects.all()
 
 
-class FilmfilterApi(generics.RetrieveAPIView):
-    serializer_class = filmfilterserializer
-    queryset = film.objects.all().order_by('-release_date')
+@csrf_exempt
+def filterfilm(request):
+    if request.method == 'GET':
+        queryset = film.objects.all().order_by('-release_date')
+        serializer = filmfilterserializer(queryset , many = True)
+        return JsonResponse(serializer.data, safe=False)
+
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors)
