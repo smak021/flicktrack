@@ -50,6 +50,12 @@ class dataserializer(serializers.ModelSerializer):
         shows = show.objects.filter(film_id = obj.film_id).order_by('-show_date')
         return showserializer(shows, many = True).data
 
+class filmfilterserializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = film
+        fields = ['film_id','film_name','release_date']
+
         
 # #REBUILD 
 # #test

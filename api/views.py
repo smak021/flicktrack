@@ -14,7 +14,7 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 #from .serializers import dataserializer,filmserializer,filmlocserializer
 from .models import show, track, film,status 
-from .serializers import showserializer, filmserializer, trackserializer,dataserializer,statusserializer
+from .serializers import filmfilterserializer, showserializer, filmserializer, trackserializer,dataserializer,statusserializer
 
 
 # Create your views here.
@@ -324,3 +324,8 @@ def filmlist(request,filmid):
 class ReportApi(generics.RetrieveAPIView):
     serializer_class = dataserializer
     queryset = film.objects.all()
+
+
+class FilmfilterApi(generics.RetrieveAPIView):
+    serializer_class = filmfilterserializer
+    queryset = film.objects.all().order_by('-release_date')
