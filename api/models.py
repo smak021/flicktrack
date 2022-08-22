@@ -17,7 +17,7 @@ class film(models.Model):
     film_censor = models.CharField(max_length=50)
     film_duration = models.CharField(max_length=50)
     full_name = models.CharField(max_length=50)
-    status = models.CharField(max_length=30,default="active")
+    film_status = models.CharField(max_length=30,default="active")
     cast_n_crew = models.CharField(max_length=1000)
 
     def __str__(self):

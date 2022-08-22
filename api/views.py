@@ -22,7 +22,7 @@ def home_pg(self):
 @csrf_exempt
 def films(request):
     if request.method == 'GET':
-        filmdata = film.objects.filter(status='active').order_by('-release_date')
+        filmdata = film.objects.filter(film_status='active').order_by('-release_date')
         serializer = filmserializer(filmdata, many=True)
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'PUT':

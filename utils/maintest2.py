@@ -93,7 +93,7 @@ locData = requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
 locData_json = json.loads(locData)
 # print(locData_json)
 for film in film_data_json:
-    if(film['status']!='inactive'):
+    if(film['film_status']!='inactive'):
         for loc in locData_json:
             if(loc['is_currently_tracking'!='no'] or loc['is_currently_tracking'!='N']):
                 main_data(film['film_name'],film['film_id'],loc['track_location'],loc['loc_real_name'],loc['theatre_code'])
