@@ -6,7 +6,8 @@ json_data=['KOZH','TRIV','KOCH']
 # uu= requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
 # json_data=json.loads(uu)
 for fmlo in json_data:
-    loc = fmlo['track_location']
+    # loc = fmlo['track_location']
+    loc = fmlo
     payload='{"bmsId":"1.760661160.1633786977283","regionCode":"'+loc+'","isSuperstar":"N"}'
     print(payload)
     requests.adapters.DEFAULT_RETRIES = 5
