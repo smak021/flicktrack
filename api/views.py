@@ -176,7 +176,7 @@ def singleFilm(request,filmid):
 class TheatreData(views.APIView):
     def get(self,request,filmid):
         data={}
-        for row in show.objects.filter(film_id=filmid).order_by('-show_date'):
+        for row in show.objects.filter(film_id=filmid).order_by('theatre_code'):
             booked = 0
             total =0
             amount = 0
@@ -185,11 +185,11 @@ class TheatreData(views.APIView):
                 total = int(data[row.theatre_code]['total_seats'])
                 amount = float(data[row.theatre_code]['total_amount'])
             else:
-                number = show.objects.filter(film_id=filmid,theatre_code = row.theatre_code).values_list('show_id',flat=True).distinct()                 
+                number = show.objects.filter(film_id=filmid, theatre_code = row.theatre_code).values_list('show_id',flat=True).distinct()                 
             booked += int(row.booked_seats)  
             total += int(row.total_seats)
             amount += int(row.booked_seats) * math.floor(float(row.price))
-            data[row.theatre_code] = {"Name": row.film.full_name,'Theatre_Name':row.theatre_name,'theatre_location':row.theatre_location,'shows':len(number),"booked_seats":booked,"total_seats":total,'total_amount':amount}
+            data[row.theatre_code] = {"name": row.film.full_name,'theatre_code':row.theatre_code,'theatre_name':row.theatre_name,'theatre_location':row.theatre_location,'shows':len(number),"booked_seats":booked,"total_seats":total,'total_amount':amount}
         return Response(data)
 
 
@@ -211,7 +211,7 @@ class EndPoint(views.APIView):
             booked += int(rec.booked_seats)  
             total += int(rec.total_seats)
             amount += int(rec.booked_seats) * math.floor(float(rec.price))
-            data[rec.show_date] = {"Name": rec.film.full_name,'shows':len(number),"booked_seats":booked,"total_seats":total,'total_amount':amount}
+            data[rec.show_date] = {"name": rec.film.full_name,'date':rec.show_date,'shows':len(number),"booked_seats":booked,"total_seats":total,'total_amount':amount}
         return Response(data)
 
 
