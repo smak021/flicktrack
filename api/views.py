@@ -1,7 +1,9 @@
+import math
 from re import T
 from django.shortcuts import render
 from pkg_resources import safe_extra
-from rest_framework import status,generics
+from rest_framework import status,generics,views
+from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from django.views.decorators.csrf import csrf_exempt
@@ -157,6 +159,60 @@ def filmlist(request,filmid):
 class ReportApi(generics.RetrieveAPIView):
     serializer_class = dataserializer
     queryset = film.objects.all()
+
+@csrf_exempt
+def singleFilm(request,filmid):
+    if request.method == 'GET':
+        filmdata = film.objects.filter(film_id = filmid)
+        serializer = filmserializer(filmdata, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors)
+
+
+class TheatreData(views.APIView):
+    def get(self,request,filmid):
+        data={}
+        for row in show.objects.filter(film_id=filmid).order_by('-show_date'):
+            booked = 0
+            total =0
+            amount = 0
+            if row.theatre_code in data:
+                booked = int(data[row.theatre_code]['booked_seats'])
+                total = int(data[row.theatre_code]['total_seats'])
+                amount = float(data[row.theatre_code]['total_amount'])
+            else:
+                number = show.objects.filter(film_id=filmid,theatre_code = row.theatre_code).values_list('show_id',flat=True).distinct()                 
+            booked += int(row.booked_seats)  
+            total += int(row.total_seats)
+            amount += int(row.booked_seats) * math.floor(float(row.price))
+            data[row.theatre_code] = {"Name": row.film.full_name,'Theatre_Name':row.theatre_name,'theatre_location':row.theatre_location,'shows':len(number),"booked_seats":booked,"total_seats":total,'total_amount':amount}
+        return Response(data)
+
+
+
+
+class EndPoint(views.APIView):
+    def get(self, request,filmid):
+        data={}
+        for rec in show.objects.filter(film_id=filmid).order_by('-show_date'):
+            booked = 0
+            total =0
+            amount = 0
+            if rec.show_date in data:
+                booked = int(data[rec.show_date]['booked_seats'])
+                total = int(data[rec.show_date]['total_seats'])
+                amount = float(data[rec.show_date]['total_amount'])
+            else:
+                number = show.objects.filter(film_id=filmid,show_date = rec.show_date).values_list('show_id',flat=True).distinct()                 
+            booked += int(rec.booked_seats)  
+            total += int(rec.total_seats)
+            amount += int(rec.booked_seats) * math.floor(float(rec.price))
+            data[rec.show_date] = {"Name": rec.film.full_name,'shows':len(number),"booked_seats":booked,"total_seats":total,'total_amount':amount}
+        return Response(data)
 
 
 @csrf_exempt
