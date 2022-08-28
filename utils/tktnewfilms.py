@@ -32,7 +32,7 @@ for val in query:
                 print("Passed")
                 print(bms_id)
                 payload = {"tn_code":m_code}
-                putData =requests.put('http://flicktracks.herokuapp.com/api/upfilm/'+bms_id+'/', json=payload, headers={'Content-type': 'application/json'})
+                putData =requests.put('http://flicktracks.herokuapp.com/api/upfilm/'+bms_id, json=payload, headers={'Content-type': 'application/json'})
                 print(putData.status_code)
         # print("Movie_Link:",val2.a["href"])
 

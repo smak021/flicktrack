@@ -134,7 +134,8 @@ def snippet_detail(request, pk):
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        serializer = filmserializer(snippet, data=request.data)
+        putData = JSONParser().parse(request)
+        serializer = filmserializer(snippet, data=putData)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
