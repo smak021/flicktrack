@@ -147,7 +147,7 @@ def filmlist(request,filmid):
         serializer = filmserializer(film_data, data=pdata)
 
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(commit=False)
             return JsonResponse(serializer.data)
         return JsonResponse(serializer.errors)
 

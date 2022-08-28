@@ -25,8 +25,12 @@ for val in query:
         film_data_json = json.loads(film_data)
         for film in film_data_json:
             bms_id = film['film_id']
-            check_match = SequenceMatcher(None,movie_id.lower(),film['film_name'].lower()).ratio()
+            print("Checking", movie_id, film['full_name'])
+            check_match = SequenceMatcher(None,movie_id.lower(),film['full_name'].lower()).ratio()
+            # print(check_match)
             if check_match>0.8:
+                print("Passed")
+                print(bms_id)
                 payload = {"tn_code":m_code}
                 putData =requests.put('http://flicktracks.herokuapp.com/api/putfilm/'+bms_id+'/', json=payload, headers={'Content-type': 'application/json'})
                 print(putData.status_code)
