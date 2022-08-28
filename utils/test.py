@@ -5,9 +5,9 @@ from difflib import SequenceMatcher
 
 
 #BMS - Ticket New Linking by comparing
-bms_title = 'yatraa'
+bms_title = 'Liger (U/A)  -Malayalam'
 
-tktnew_title = "Yathra"
+tktnew_title = "Liger (Malayalam)"
 
 check_match = SequenceMatcher(None,tktnew_title.lower(),bms_title.lower()).ratio()
 print(check_match)

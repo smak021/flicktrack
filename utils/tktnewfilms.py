@@ -3,8 +3,8 @@ from bs4 import BeautifulSoup
 from difflib import SequenceMatcher
 import requests
 
-url = "https://www.ticketnew.com/online-advance-booking/Movies/C"
 
+url = "https://www.ticketnew.com/online-advance-booking/Movies/C"
 requ = requests.get(url+"/Kochi")
 html = BeautifulSoup(requ.content,"html.parser")
 query = html.find("div",id="now_showing")
@@ -25,7 +25,7 @@ for val in query:
         film_data_json = json.loads(film_data)
         for film in film_data_json:
             bms_id = film['film_id']
-            print("Checking", movie_id, film['full_name'])
+            # print("Checking", movie_id, film['full_name'])
             check_match = SequenceMatcher(None,movie_id.lower(),film['full_name'].lower()).ratio()
             # print(check_match)
             if check_match>0.8:

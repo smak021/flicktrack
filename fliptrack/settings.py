@@ -102,7 +102,6 @@ WSGI_APPLICATION = 'fliptrack.wsgi.application'
 
 
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

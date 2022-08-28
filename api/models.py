@@ -57,6 +57,7 @@ class track(models.Model):
     is_currently_tracking = models.CharField(max_length=50, default="Y")
     loc_real_name = models.CharField(max_length=50)
     theatre_code = models.CharField(max_length=30,default="null")
+    
 
     def __str__(self):
         return self.track_id

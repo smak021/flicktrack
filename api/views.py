@@ -1,3 +1,4 @@
+from functools import partial
 import math
 from re import T
 from django.shortcuts import render
@@ -135,11 +136,11 @@ def snippet_detail(request, pk):
 
     elif request.method == 'PUT':
         putData = JSONParser().parse(request)
-        serializer = filmserializer(snippet, data=putData)
+        serializer = filmserializer(snippet, data=putData,partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors)
 
 # Put film using film ID provided by BMS
 @csrf_exempt
