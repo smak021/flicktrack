@@ -144,12 +144,16 @@ def filmlist(request,filmid):
 
     elif request.method == 'PUT':
         pdata = JSONParser().parse(request)
-        serializer = filmserializer(film_data, data=pdata)
-
+        serializer = filmserializer(film_data, data=request.data)
         if serializer.is_valid():
-            serializer.save(commit=False)
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors)
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # if serializer.is_valid():
+        #     serializer.save(commit=False)
+        #     return JsonResponse(serializer.data)
+        # return JsonResponse(serializer.errors)
 
     elif request.method == 'DELETE':
         film_data.delete()
