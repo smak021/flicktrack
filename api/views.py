@@ -2,6 +2,7 @@ import math
 from re import T
 from django.shortcuts import render
 from pkg_resources import safe_extra
+from rest_framework.decorators import api_view
 from rest_framework import status,generics,views
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
@@ -119,6 +120,25 @@ def putShow(request, showid, categoryname):
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
 
+
+#Update
+@api_view(['GET', 'PUT'])
+def snippet_detail(request, pk):
+    try:
+        snippet = film.objects.get(pk=pk)
+    except snippet.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = filmserializer(snippet)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = filmserializer(snippet, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Put film using film ID provided by BMS
 @csrf_exempt

@@ -1,12 +1,13 @@
 from django.contrib import admin
 from django.urls import path
-from api.views import EndPoint, TheatreData, filterfilm, films, singleFilm, tracks, shows, filmlist, putShow,ReportApi,statuss
+from api.views import EndPoint, TheatreData,snippet_detail, filterfilm, films, singleFilm, tracks, shows, filmlist, putShow,ReportApi,statuss
 
 
 urlpatterns = [
   path('status/',statuss),
   path('putshow/<str:showid>/<str:categoryname>/',putShow),
   path('films/',films),
+  path('upfilm/<str:pk>',snippet_detail),
   path('putfilm/<str:filmid>/',filmlist),
   path('shows/',shows),
   path('tracks/',tracks),
