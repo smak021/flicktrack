@@ -94,5 +94,5 @@ locData_json = json.loads(locData)
 for film in film_data_json:
     if(film['film_status']!='inactive'):
         for loc in locData_json:
-            if(loc['is_currently_tracking']!='no' or loc['is_currently_tracking']!='N'):
+            if loc['is_currently_tracking']!='no' or loc['is_currently_tracking']!='N' or loc['loc_real_name']!='TN':
                 main_data(film['film_name'],film['film_id'],loc['track_location'],loc['loc_real_name'],loc['theatre_code'])

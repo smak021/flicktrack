@@ -1,8 +1,7 @@
-from functools import partial
-import math
-from re import T
-from django.shortcuts import render
-from pkg_resources import safe_extra
+from django.db.models import Sum,F
+from django.db.models.functions import Cast
+from django.db.models import IntegerField
+from django.db.models import FloatField
 from rest_framework.decorators import api_view
 from rest_framework import status,generics,views
 from rest_framework.response import Response
@@ -202,20 +201,18 @@ def singleFilm(request,filmid):
 class TheatreData(views.APIView):
     def get(self,request,filmid):
         data={}
-        for row in show.objects.filter(film_id=filmid).order_by('theatre_code'):
-            booked = 0
-            total =0
-            amount = 0
-            if row.theatre_code in data:
-                booked = int(data[row.theatre_code]['booked_seats'])
-                total = int(data[row.theatre_code]['total_seats'])
-                amount = float(data[row.theatre_code]['total_amount'])
-            else:
-                number = show.objects.filter(film_id=filmid, theatre_code = row.theatre_code).values_list('show_id',flat=True).distinct()                 
-            booked += int(row.booked_seats)  
-            total += int(row.total_seats)
-            amount += int(row.booked_seats) * math.floor(float(row.price))
-            data[row.theatre_code] = {"name": row.film.full_name,'theatre_code':row.theatre_code,'theatre_name':row.theatre_name,'theatre_location':row.theatre_location,'shows':len(number),"booked_seats":booked,"total_seats":total,'total_amount':amount}
+        filmname = film.objects.filter(film_id=filmid).first().full_name
+        print(filmname)
+        for row in show.objects.filter(film_id=filmid).order_by('theatre_code').values_list('theatre_code',flat=True).distinct():
+            print(row)
+            query = show.objects.filter(film_id=filmid, theatre_code=row)
+            theatre_name = query.first().theatre_name
+            theatre_location = track.objects.filter(theatre_code = row).first().loc_real_name
+            number = query.values_list('show_id',flat=True).distinct().count()     
+            test_booked = query.annotate(booked_seat=Cast('booked_seats', IntegerField())).aggregate(Sum('booked_seat'))
+            test_amount = query.annotate(booked_seat=Cast('booked_seats', IntegerField()),amount = Cast('price',FloatField())).aggregate(total=Sum(F('booked_seat')*F('amount'),output_field=FloatField()))
+            test_total = query.annotate(t_seat=Cast('total_seats', IntegerField())).aggregate(Sum('t_seat'))
+            data[row] = {"name": filmname,'theatre_code':row,'theatre_name':theatre_name,'theatre_location':theatre_location.capitalize(),'shows':number,"booked_seats":test_booked['booked_seat__sum'],"total_seats":test_total["t_seat__sum"],'total_amount':test_amount["total"]}
         return Response(data)
 
 
@@ -224,20 +221,16 @@ class TheatreData(views.APIView):
 class EndPoint(views.APIView):
     def get(self, request,filmid):
         data={}
-        for rec in show.objects.filter(film_id=filmid).order_by('-show_date'):
-            booked = 0
-            total =0
-            amount = 0
-            if rec.show_date in data:
-                booked = int(data[rec.show_date]['booked_seats'])
-                total = int(data[rec.show_date]['total_seats'])
-                amount = float(data[rec.show_date]['total_amount'])
-            else:
-                number = show.objects.filter(film_id=filmid,show_date = rec.show_date).values_list('show_id',flat=True).distinct()                 
-            booked += int(rec.booked_seats)  
-            total += int(rec.total_seats)
-            amount += int(rec.booked_seats) * math.floor(float(rec.price))
-            data[rec.show_date] = {"name": rec.film.full_name,'date':rec.show_date,'shows':len(number),"booked_seats":booked,"total_seats":total,'total_amount':amount}
+        filmname = film.objects.filter(film_id=filmid).first().full_name
+        print(filmname)
+        for row in show.objects.filter(film_id=filmid).order_by('-show_date').values_list('show_date',flat=True).distinct():
+            print(row)
+            query = show.objects.filter(film_id=filmid, show_date=row)
+            booked = query.annotate(booked_seat=Cast('booked_seats', IntegerField())).aggregate(Sum('booked_seat'))["booked_seat__sum"]
+            amount = query.annotate(booked_seat=Cast('booked_seats', IntegerField()),amount = Cast('price',FloatField())).aggregate(total=Sum(F('booked_seat')*F('amount'),output_field=FloatField()))["total"]
+            total = query.annotate(t_seat=Cast('total_seats', IntegerField())).aggregate(Sum('t_seat'))["t_seat__sum"]
+            number = query.values_list('show_id',flat=True).distinct().count() 
+            data[row] = {"name": filmname,'date':row,'shows':number,"booked_seats":booked,"total_seats":total,'total_amount':amount}
         return Response(data)
 
 

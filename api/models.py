@@ -1,7 +1,4 @@
-from cgi import print_exception
-from pickle import TRUE
-from pyexpat import model
-from unicodedata import category
+
 from django.db import models
 # Create your models here.
 #New Simple Table
@@ -25,7 +22,7 @@ class film(models.Model):
         return self.film_id
 
 class status(models.Model):
-    film = models.OneToOneField(film,on_delete=models.CASCADE,primary_key=TRUE)
+    film = models.OneToOneField(film,on_delete=models.CASCADE,primary_key=True)
     is_tracking = models.BooleanField(default=True)
 
     def __str__(self):

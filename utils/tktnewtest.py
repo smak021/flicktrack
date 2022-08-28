@@ -18,6 +18,7 @@ for val in query:
         # print(val2.li.a["data-tkts"])
         try:
             if(val2.a["data-venue"]==venue_code):
+                
                 print(val2.a["data-venuen"])
                 print(val2.a["data-venue"])
                 print(val2.a["data-tkts"])
