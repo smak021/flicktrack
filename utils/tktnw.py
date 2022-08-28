@@ -6,29 +6,38 @@ import requests
 import ast
 
 # Ticket New
-
-tktnewUrl = "https://www.ticketnew.com/Nna-Thaan-Case-Kodu--Movie-Tickets-Online-Show-Timings/Online-Advance-Booking/25382/C/Calicut"
-venue_code = '15130'
+location='Mukkam'
+venue_code = '15123'
+# movie_text ='Nna-Thaan-Case-Kodu--Movie-Tickets-Online-Show-Timings'
+movie_code= '25382'
+t_price ='120.0'
+tktnewUrl = "https://www.ticketnew.com/test/Online-Advance-Booking/"+movie_code+"/C/"+location+"/"
 requ = requests.get(tktnewUrl)
 html = BeautifulSoup(requ.content,"html.parser")
-query = html.find_all("div",class_="tn-timing-details")
+movie_name = html.find("div",class_='movie-details tn-entity-details')
+query = html.find_all("a",{'data-venue':True,'data-venue':venue_code})
 for val in query:
-    for val2 in val.ul:
-        # print(val2.li.a["data-venuen"])
-        # print(val2.li.a["data-tkts"])
+    print(movie_name.h2.string)
+    # print(val['data-venuen'])
+    # print(val["data-tkts"])
+    print("Theatre Name: ",val["data-venuen"])
+    print("Venue: ",val["data-venue"])
+    # print("Data: ",val["data-tkts"])
+    jss =str(val["data-tkts"])
+    dictt = json.loads(jss)
+    for row in dictt:
         try:
-            if(val2.a["data-venue"]==venue_code):
-                print(val2.a["data-venuen"])
-                print(val2.a["data-venue"])
-                print(val2.a["data-tkts"])
-                jss =str(val2.a["data-tkts"])
-                dictt = json.loads(jss)
-                print(dictt[0]["Total"])
-                print(dictt[0]["Avail"])
-                
+            print("Class:", row["Name"])
+            print("|----Available Seats: ",row["Avail"])
+            print("|----Total Seats: ",row["Total"])
+            price = row['Rate']
+            if not price == 0.0:
+                print("|----Price: ",row['Rate'])
+            else:
+                print("|----Price: ",t_price)
         except AttributeError:
             print("Not found")
-    # print(val.ul.li.a)
+    print("-------------------------------------")
 
 # venue_url=requests.get("https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode=ATTR").text
 # vjson = json.loads(venue_url)

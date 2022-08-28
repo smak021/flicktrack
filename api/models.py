@@ -19,6 +19,7 @@ class film(models.Model):
     full_name = models.CharField(max_length=50)
     film_status = models.CharField(max_length=30,default="active")
     cast_n_crew = models.CharField(max_length=1000)
+    tn_code = models.CharField(max_length=50,default="NA")
 
     def __str__(self):
         return self.film_id
