@@ -1,7 +1,5 @@
-from django.db.models import Sum,F
 from django.db.models.functions import Cast
-from django.db.models import IntegerField
-from django.db.models import FloatField
+from django.db.models import IntegerField,Q,FloatField, Sum, F
 from rest_framework.decorators import api_view
 from rest_framework import status,generics,views
 from rest_framework.response import Response
@@ -25,7 +23,7 @@ def home_pg(self):
 @csrf_exempt
 def films(request):
     if request.method == 'GET':
-        filmdata = film.objects.filter(film_status='active').order_by('-release_date')
+        filmdata = film.objects.filter(~Q(film_status='inactive')).order_by('-release_date')
         serializer = filmserializer(filmdata, many=True)
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'PUT':

@@ -119,7 +119,7 @@ def ptm_track(code,ptm_theatre_id,city,bm_id,offset):
                         else:
                             offset_in = 0
                         available_seat = section['sAvail'] + offset_in
-                        booked_seat = section['sTotal']-section['sAvail']
+                        booked_seat = total_seat-available_seat
                         price = section['price']
                         print("Category Name:", category_name)
                         print("Total:",total_seat)
