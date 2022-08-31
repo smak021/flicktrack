@@ -9,7 +9,6 @@ import re
 def ptm_track(code,ptm_theatre_id,city,bm_id,offset):
     tz_NY = pytz.timezone('Asia/Kolkata')   
     datetime_NY = datetime.now(tz_NY)
-    
     url = "https://apiproxy.paytm.com/v3/movies/search/movie?meta=1&reqData=1&city="+city+"&movieCode="+code+"&version=3&site_id=1&channel=HTML5&child_site_id=1" 
     data = requests.get(url).text
     if(data):
@@ -20,6 +19,7 @@ def ptm_track(code,ptm_theatre_id,city,bm_id,offset):
             for show in json_data['pageData']['sessions'][row]:
                 cid = show['cid']
                 if(cid == int(ptm_theatre_id)):
+                    print("Name:",json_data['meta']['movies'][0]['name'])
                     my_item = next((item for item in json_data['meta']['cinemas'] if item['id'] == cid), None)
                     print("Ptm ID",code)
                     print("film_id:",bm_id)
@@ -45,10 +45,20 @@ def ptm_track(code,ptm_theatre_id,city,bm_id,offset):
                         category_name = section['label']
                         total_seat = section['sTotal']
                         if(offset!='na'):
-                            offset_in = int(offset)
+                            ind_offset = offset.rsplit(',')
+                            for roffset in ind_offset:
+                                offset_splt = roffset.rsplit(':')
+                                if(offset_splt[0]==screen_name):
+                                    offset_in = int(offset_splt[1])
+                                    break
+                                else:
+                                    offset_in = 0
                         else:
                             offset_in = 0
+                        print("Offset:", offset_in)
                         available_seat = section['sAvail'] + offset_in
+                        if(available_seat>total_seat):
+                            available_seat = total_seat
                         booked_seat = total_seat-available_seat
                         price = section['price']
                         print("Category Name:", category_name)
@@ -65,11 +75,12 @@ film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
 film_data_json = json.loads(film_data)
 locData = requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
 locData_json = json.loads(locData)
-for film in film_data_json:
-    if(film['film_status']!='inactive') and (film['ptm_code']!='NA'):
-        for loc in locData_json:
-            if(loc['is_currently_tracking']!='no' or loc['is_currently_tracking']!='N') and (loc['source']=='ptm'):
-                ptm_track('bote0jbze','2661','kozhikode', film['film_id'],loc['offset'])
+# for film in film_data_json:
+#     if(film['film_status']!='inactive') and (film['ptm_code']!='NA'):
+#         for loc in locData_json:
+#             if(loc['is_currently_tracking']!='no' or loc['is_currently_tracking']!='N') and (loc['source']=='ptm'):
+for flm in ['umt~pab0oz','zvemxv5t_','c_~xsdkhb']:
+    ptm_track(flm,'31788','mukkam', 'ET00335980','LITTLE ROSE 2K:17,SCREEN 2:15,SCREEN 1 4K Atmos:28')
                 
 # location = 'kozhikode'
 # ptm_film_id = 'nvrmir2cs'

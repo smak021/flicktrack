@@ -42,7 +42,6 @@ def main_data(film_namee,film_ID, fm_loc,loc_slug, venue):
         print(theatre_name)
         print(session)
         website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid='+venue+'&ssid='+session+'&format=json'
-        
         url2 = requests.get(website2).text
         data = json.loads(url2)
         i=0
@@ -91,6 +90,8 @@ def ptm_track(code,ptm_theatre_id,city,bm_id,offset):
                 cid = show['cid']
                 if(cid == int(ptm_theatre_id)):
                     my_item = next((item for item in json_data['meta']['cinemas'] if item['id'] == cid), None)
+                    print("------------------------------------------")  
+                    print("Name:",json_data['meta']['movies'][0]['name'])         
                     print("Ptm ID",code)
                     print("film_id:",bm_id)
                     show_id = show['sid']
@@ -115,9 +116,17 @@ def ptm_track(code,ptm_theatre_id,city,bm_id,offset):
                         category_name = section['label']
                         total_seat = section['sTotal']
                         if(offset!='na'):
-                            offset_in = int(offset)
+                            ind_offset = offset.rsplit(',')
+                            for roffset in ind_offset:
+                                offset_splt = roffset.rsplit(':')
+                                if(offset_splt[0]==screen_name):
+                                    offset_in = int(offset_splt[1])
+                                    break
+                                else:
+                                    offset_in = 0
                         else:
                             offset_in = 0
+                        print("Offset:", offset_in)
                         available_seat = section['sAvail'] + offset_in
                         booked_seat = total_seat-available_seat
                         price = section['price']
@@ -130,7 +139,6 @@ def ptm_track(code,ptm_theatre_id,city,bm_id,offset):
                         payload ={"show_id": show_id,"theatre_name":theatre_name,"show_time": ptm_time,"screen_name": screen_name,"show_date": ptm_date,"category_name": category_name,"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"theatre_code": theatre_code,"theatre_location": city,"last_modified": cur_time,"film": bm_id}
                         putt = requests.put('http://flicktracks.herokuapp.com/api/putshow/'+show_id+'/'+category_name+'/',json=payload, headers={'Content-type': 'application/json'})
                         print("Status Code:",putt.status_code)
-                    print("------------------------------------------")           
 
 # film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
 # film_data_json = json.loads(film_data)
@@ -142,16 +150,15 @@ def ptm_track(code,ptm_theatre_id,city,bm_id,offset):
 #         main_data(film['film_name'], film['film_id'], loc['track_location'], loc['loc_real_name'])
 
 # Test Call
-
 film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
 film_data_json = json.loads(film_data)
 locData = requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
 locData_json = json.loads(locData)
 for film in film_data_json:
-    if (film['film_status']!='inactive') and (film['film_status']!='stopped'):
+    if (film['film_status']!='stopped'):
         for loc in locData_json:
             if (loc['is_currently_tracking']!='no' or loc['is_currently_tracking']!='N'):
                 if(loc['source']=='bms'):
                     main_data(film['film_name'],film['film_id'],loc['track_location'],loc['loc_real_name'],loc['theatre_code'])
                 if(film['ptm_code']!='NA') and (loc['source']=='ptm'):
-                    ptm_track(film['ptm_code'],loc['theatre_code'],loc['track_location'], film['film_id'],loc['offset'])
+                    ptm_track(film['ptm_code'],loc['theatre_code'],loc['track_location'], film['film_id'],loc['offset_check'])
