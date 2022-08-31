@@ -148,7 +148,7 @@ film_data_json = json.loads(film_data)
 locData = requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
 locData_json = json.loads(locData)
 for film in film_data_json:
-    if (film['film_status']!='inactive') or (film['film_status']!='stopped'):
+    if (film['film_status']!='inactive') and (film['film_status']!='stopped'):
         for loc in locData_json:
             if (loc['is_currently_tracking']!='no' or loc['is_currently_tracking']!='N'):
                 if(loc['source']=='bms'):
