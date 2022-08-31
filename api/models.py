@@ -18,6 +18,7 @@ class film(models.Model):
     cast_n_crew = models.CharField(max_length=1000)
     tn_code = models.CharField(max_length=50,default="NA")
     ptm_code = models.CharField(max_length=50, default="NA")
+   
 
     def __str__(self):
         return self.film_id
@@ -58,7 +59,6 @@ class track(models.Model):
     source = models.CharField(max_length=30,default="bms")
     offset = models.CharField(max_length=40,default='na')
     offset_check = models.CharField(max_length=40,default='na')
-    
 
     def __str__(self):
         return self.track_id

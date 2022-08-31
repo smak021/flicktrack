@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 import requests
 import pytz
 
-
 def tn_process(location,venue_code,film_id,movie_code,tkt_price):
     tz_NY = pytz.timezone('Asia/Kolkata')   
     datetime_NY = datetime.now(tz_NY)
@@ -57,6 +56,8 @@ def tn_process(location,venue_code,film_id,movie_code,tkt_price):
                 print("Not found")
         print("-------------------------------------")
 
+
+
 film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
 film_data_json = json.loads(film_data)
 locData = requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
@@ -64,5 +65,8 @@ locData_json = json.loads(locData)
 for film in film_data_json:
     if(film['film_status']!='inactive') and (film['tn_code']!='NA'):
         for loc in locData_json:
-            if(loc['is_currently_tracking']!='no' or loc['is_currently_tracking']!='N') and (loc['loc_real_name']=='TN' or loc['loc_real_name']=='tn'):
+            if(loc['is_currently_tracking']!='no' or loc['is_currently_tracking']!='N') and (loc['source']=='tn'):
                 tn_process(loc['track_location'],loc['theatre_code'],film['film_id'],film['tn_code'],'120.0')
+
+
+                
