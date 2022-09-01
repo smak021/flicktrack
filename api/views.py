@@ -201,7 +201,8 @@ class TheatreData(views.APIView):
         data={}
         filmname = film.objects.filter(film_id=filmid).first().full_name
         print(filmname)
-        for row in show.objects.filter(film_id=filmid).order_by('theatre_code').values_list('theatre_code',flat=True).distinct():
+        theatre_idList = show.objects.filter(film_id=filmid).order_by('theatre_name').values_list('theatre_code',flat=True).distinct()
+        for row in theatre_idList:
             print(row)
             query = show.objects.filter(film_id=filmid, theatre_code=row)
             theatre_name = query.first().theatre_name

@@ -1,8 +1,23 @@
 from django.contrib import admin
+from .models import show,film,track
 #from .models import ft_data, film_det,film_loc
 # from .models import film, show, track
 
+
+
 # Register your models here.
+
+@admin.register(show)
+class shows(admin.ModelAdmin):
+    list_display = [field.name for field in show._meta.get_fields()]
+
+@admin.register(film)
+class films(admin.ModelAdmin):
+    list_display=['film_id','full_name','release_date','film_status','tn_code','ptm_code']
+       
+@admin.register(track)
+class track(admin.ModelAdmin):
+    list_display = ['track_id','theatre_code','track_location','loc_real_name','is_currently_tracking','offset_check','offset','source']
 
 # @admin.register(film)
 # class films(admin.ModelAdmin):

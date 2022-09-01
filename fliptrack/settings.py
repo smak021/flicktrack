@@ -30,7 +30,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'n')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['flicktracks.herokuapp.com','127.0.0.1']
 
@@ -100,18 +100,27 @@ WSGI_APPLICATION = 'fliptrack.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.environ.get('DATABASE_NAME'),
+#         'USER': os.environ.get('DATABASE_USER'),
+#         'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
+#         'HOST': os.environ.get('DATABASE_HOST'),
+#         'PORT': '5432'
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DATABASE_NAME'),
-        'USER': os.environ.get('DATABASE_USER'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-        'HOST': os.environ.get('DATABASE_HOST'),
-        'PORT': '5432'
+        'NAME': 'flick_track',
+        'USER': 'smak_ft',
+        'PASSWORD': 'doomsdayends021sfmak',
+        'HOST': 'database-1.csjd7x8pr0tx.ap-south-1.rds.amazonaws.com',
+        'PORT': '5432',
     }
 }
-
-
 
 db_from_env = dj_database_url.config(conn_max_age=600)
 DATABASES['default'].update(db_from_env)

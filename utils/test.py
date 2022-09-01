@@ -1,18 +1,33 @@
 from telnetlib import TN3270E
+from time import strptime
 import requests
 import json
 import re
 from bs4 import BeautifulSoup
 from datetime import date
 import pytz
+from datetime import datetime, timedelta
 from difflib import SequenceMatcher
 
 # BMS Efficient
 
-chf='gfdgfd'
+# Find date or time difference
+def dateDiff(inputDate):
+    tz_NY = pytz.timezone('Asia/Kolkata')   
+    datetime_NY = datetime.now(tz_NY)
+    dateFormat = '%Y%m%d %I:%M %p'
+    todaydate = datetime_NY.strftime(dateFormat)
+    inDate = datetime.strptime(todaydate, dateFormat)
+    tDate = datetime.strptime(inputDate, dateFormat)
+    res = inDate - tDate
+    return res
 
-sfn = chf.rsplit(':')
-print(sfn)
+res = dateDiff('20220905',None)
+print(res.days)
+print(res.seconds)
+# tz_NY = pytz.timezone('Asia/Kolkata')   
+# datetime_NY = datetime.now(tz_NY)
+# print(datetime_NY.strftime('%I:%M %p'))
 # def bms_track(theatre_code,location,loc_slug):
 #     url = 'https://in.bookmyshow.com/'+loc_slug+'/cinemas'
 #     page = requests.get(url)
