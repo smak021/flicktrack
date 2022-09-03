@@ -30,14 +30,12 @@ class status(models.Model):
     def __str__(self):
         return self.film_id
 
-class show(models.Model):
+class mdata(models.Model):
     id = models.AutoField(auto_created=True,primary_key=True)
-    show_id = models.CharField(max_length=50)
-    show_time = models.CharField(max_length=50)
-    screen_name = models.CharField(max_length=50)
     show_date = models.CharField(max_length=50)
-    category_name = models.CharField(max_length=50)
-    price = models.CharField(max_length=50)
+    show_count = models.IntegerField(max_length=20,default=0)
+    category_name = models.CharField(max_length=50,blank=True)
+    price = models.CharField(max_length=50,blank=True)
     booked_seats = models.CharField(max_length=50,default="0")
     available_seats = models.CharField(max_length=50, default="0")
     total_seats = models.CharField(max_length=50,default="0")
@@ -48,7 +46,7 @@ class show(models.Model):
     last_modified = models.CharField(max_length=50)
 
     def __str__(self):
-        return "%s %s" %(self.show_id,self.category_name)
+        return str(self.id)
 
 class track(models.Model):
     track_id = models.AutoField(auto_created=True, primary_key=True)
@@ -62,4 +60,13 @@ class track(models.Model):
 
     def __str__(self):
         return self.track_id
+
+class show(models.Model):
+    show_id = models.CharField(max_length=50,primary_key=True)
+    show_time = models.CharField(max_length=50)
+    screen_name = models.CharField(max_length=50,blank=True)
+    show_date = models.CharField(max_length=50)
+    theatre_code = models.CharField(max_length=50)
+    film = models.ForeignKey(film,on_delete=models.CASCADE)
+    last_modified = models.CharField(max_length=50,default='na')
 

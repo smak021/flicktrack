@@ -1,20 +1,20 @@
 from django.db.models.functions import Cast
 from django.db.models import IntegerField,Q,FloatField, Sum, F
 from rest_framework.decorators import api_view
-from rest_framework import status,generics,views
+from rest_framework import generics,views
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from django.views.decorators.csrf import csrf_exempt
-from .models import show, track, film,status 
-from .serializers import filmfilterserializer, showserializer, filmserializer, trackserializer,dataserializer,statusserializer
+from .models import mdata, track, film,status,show
+from .serializers import filmfilterserializer,showserializer ,mdataserializer, filmserializer, trackserializer,dataserializer,statusserializer
 
 
 # Create your views here.
 
 
 def home_pg(self):
-    return HttpResponse('<h2>Hello</h2>')
+    return HttpResponse('<h2>Welcome</h2>')
 
 
 #New 30/7/2022
@@ -37,14 +37,14 @@ def films(request):
 
 
 @csrf_exempt
-def shows(request):
+def data(request):
     if request.method == 'GET':
-        showData = show.objects.all()
-        serializer = showserializer(showData , many = True)
+        showData = mdata.objects.all()
+        serializer = mdataserializer(showData , many = True)
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'PUT':
         putData = JSONParser().parse(request)
-        serializer = showserializer(data=putData)
+        serializer = mdataserializer(data=putData)
 
         if serializer.is_valid():
             serializer.save()
@@ -84,13 +84,50 @@ def tracks(request):
 
 
 @csrf_exempt
-def putShow(request, showid, categoryname):
+def nw_putData(request,theatrecode, date,filmid):
     try:
-        showData = show.objects.get(show_id__exact = showid, category_name__exact = categoryname)
-    except show.DoesNotExist:
+        showData = mdata.objects.get(theatre_code__exact = theatrecode, show_date__exact = date,film_id__exact = filmid)
+    except mdata.DoesNotExist:
         if request.method == 'PUT':
             putData = JSONParser().parse(request)
-            serializer = showserializer(data= putData)
+            serializer = mdataserializer(data= putData)
+
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data)
+            return JsonResponse(serializer.errors)
+
+        elif request.method == 'GET':
+            return JsonResponse({'Error': 'Not Found'}, status=401)   
+    
+    if request.method == 'GET':
+        serializer = mdataserializer(showData)
+        return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        pdata = JSONParser().parse(request)
+        serializer = mdataserializer(showData, data=pdata)
+
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors)
+
+    elif request.method == 'DELETE':
+        showData.delete()
+        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+@csrf_exempt
+def putData(request, showid, categoryname):
+    try:
+        showData = mdata.objects.get(show_id__exact = showid, category_name__exact = categoryname)
+    except mdata.DoesNotExist:
+        if request.method == 'PUT':
+            putData = JSONParser().parse(request)
+            serializer = mdataserializer(data= putData)
 
             if serializer.is_valid():
                 serializer.save()
@@ -101,12 +138,12 @@ def putShow(request, showid, categoryname):
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)   
     
     if request.method == 'GET':
-        serializer = showserializer(showData)
+        serializer = dataserializer(showData)
         return JsonResponse(serializer.data)
 
     elif request.method == 'PUT':
         pdata = JSONParser().parse(request)
-        serializer = showserializer(showData, data=pdata)
+        serializer = mdataserializer(showData, data=pdata)
 
         if serializer.is_valid():
             serializer.save()
@@ -199,19 +236,22 @@ def singleFilm(request,filmid):
 class TheatreData(views.APIView):
     def get(self,request,filmid):
         data={}
+        arr=[]
         filmname = film.objects.filter(film_id=filmid).first().full_name
         print(filmname)
-        theatre_idList = show.objects.filter(film_id=filmid).order_by('theatre_name').values_list('theatre_code',flat=True).distinct()
+        theatre_idList = mdata.objects.filter(film_id=filmid).order_by('theatre_name').values_list('theatre_code',flat=True).distinct()
         for row in theatre_idList:
             print(row)
-            query = show.objects.filter(film_id=filmid, theatre_code=row)
+            query = mdata.objects.filter(film_id=filmid, theatre_code=row)
             theatre_name = query.first().theatre_name
             theatre_location = track.objects.filter(theatre_code = row).first().loc_real_name
-            number = query.values_list('show_id',flat=True).distinct().count()     
+            show_count = query.annotate(s_count=Cast('show_count', IntegerField())).aggregate(Sum('show_count'))["show_count__sum"]    
             test_booked = query.annotate(booked_seat=Cast('booked_seats', IntegerField())).aggregate(Sum('booked_seat'))
-            test_amount = query.annotate(booked_seat=Cast('booked_seats', IntegerField()),amount = Cast('price',FloatField())).aggregate(total=Sum(F('booked_seat')*F('amount'),output_field=FloatField()))
+            test_amount = query.annotate(booked_seat=Cast('booked_seats', IntegerField()),amount = Cast('price',FloatField())).aggregate(total=Sum('amount',output_field=IntegerField()))
             test_total = query.annotate(t_seat=Cast('total_seats', IntegerField())).aggregate(Sum('t_seat'))
-            data[row] = {"name": filmname,'theatre_code':row,'theatre_name':theatre_name,'theatre_location':theatre_location.capitalize(),'shows':number,"booked_seats":test_booked['booked_seat__sum'],"total_seats":test_total["t_seat__sum"],'total_amount':test_amount["total"]}
+            val = {"name": filmname,'theatre_code':row,'theatre_name':theatre_name,'theatre_location':theatre_location.capitalize(),'shows':show_count,"booked_seats":test_booked['booked_seat__sum'],"total_seats":test_total["t_seat__sum"],'total_amount':test_amount["total"]}
+            arr.append(val)
+            data = arr
         return Response(data)
 
 
@@ -222,14 +262,14 @@ class EndPoint(views.APIView):
         data={}
         filmname = film.objects.filter(film_id=filmid).first().full_name
         print(filmname)
-        for row in show.objects.filter(film_id=filmid).order_by('-show_date').values_list('show_date',flat=True).distinct():
+        for row in mdata.objects.filter(film_id=filmid).order_by('-show_date').values_list('show_date',flat=True).distinct():
             print(row)
-            query = show.objects.filter(film_id=filmid, show_date=row)
+            query = mdata.objects.filter(film_id=filmid, show_date=row)
             booked = query.annotate(booked_seat=Cast('booked_seats', IntegerField())).aggregate(Sum('booked_seat'))["booked_seat__sum"]
-            amount = query.annotate(booked_seat=Cast('booked_seats', IntegerField()),amount = Cast('price',FloatField())).aggregate(total=Sum(F('booked_seat')*F('amount'),output_field=FloatField()))["total"]
+            amount = query.annotate(booked_seat=Cast('booked_seats', IntegerField()),amount = Cast('price',FloatField())).aggregate(total=Sum('amount',output_field=IntegerField()))["total"]
             total = query.annotate(t_seat=Cast('total_seats', IntegerField())).aggregate(Sum('t_seat'))["t_seat__sum"]
-            number = query.values_list('show_id',flat=True).distinct().count() 
-            data[row] = {"name": filmname,'date':row,'shows':number,"booked_seats":booked,"total_seats":total,'total_amount':amount}
+            show_count = query.annotate(s_count=Cast('show_count', IntegerField())).aggregate(Sum('show_count'))["show_count__sum"]
+            data[row] = {"name": filmname,'date':row,'shows':show_count,"booked_seats":booked,"total_seats":total,'total_amount':amount}
         return Response(data)
 
 
@@ -244,3 +284,47 @@ def filterfilm(request):
             serializer.save()
             return JsonResponse(serializer.data)
         return JsonResponse(serializer.errors)
+
+
+# shows
+@csrf_exempt
+def putShow(request,showid):
+    try:
+        showData = show.objects.get(show_id__exact = showid)
+    except show.DoesNotExist:
+        if request.method == 'PUT':
+            putData = JSONParser().parse(request)
+            serializer = showserializer(data= putData)
+
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data)
+            return JsonResponse(serializer.errors)
+
+        elif request.method == 'GET':
+            return JsonResponse({'error':'Not Found'}, status=401)   
+    
+    if request.method == 'GET':
+        serializer = showserializer(showData)
+        return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        pdata = JSONParser().parse(request)
+        serializer = showserializer(showData, data=pdata)
+
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors)
+
+    elif request.method == 'DELETE':
+        showData.delete()
+        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
+
+@csrf_exempt
+def getShows(request,theatrecode, date,filmid):
+    if request.method == 'GET':
+        queryset = show.objects.filter(theatre_code__exact = theatrecode, show_date__exact = date,film_id__exact=filmid)
+        serializer = showserializer(queryset , many = True)
+        return JsonResponse(serializer.data, safe=False)
+

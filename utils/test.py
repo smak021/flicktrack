@@ -11,6 +11,20 @@ from difflib import SequenceMatcher
 
 # BMS Efficient
 
+
+arr=['235','43432','4355']
+test=''
+for ser in [1,2]:
+    for count,item in enumerate(arr,start=1):
+        print(item)
+    print(count)
+
+# for n in arr:
+#     test = ':'.join([n,test])
+   
+# print(test.rstrip(':'))
+
+
 # Find date or time difference
 def dateDiff(inputDate):
     tz_NY = pytz.timezone('Asia/Kolkata')   
@@ -22,9 +36,9 @@ def dateDiff(inputDate):
     res = inDate - tDate
     return res
 
-res = dateDiff('20220905',None)
-print(res.days)
-print(res.seconds)
+# res = dateDiff('20220905',None)
+# print(res.days)
+# print(res.seconds)
 # tz_NY = pytz.timezone('Asia/Kolkata')   
 # datetime_NY = datetime.now(tz_NY)
 # print(datetime_NY.strftime('%I:%M %p'))

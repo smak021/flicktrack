@@ -1,15 +1,18 @@
 from django.contrib import admin
-from .models import show,film,track
+from .models import mdata,film,track,show
 #from .models import ft_data, film_det,film_loc
 # from .models import film, show, track
 
 
 
 # Register your models here.
-
 @admin.register(show)
-class shows(admin.ModelAdmin):
+class show(admin.ModelAdmin):
     list_display = [field.name for field in show._meta.get_fields()]
+
+@admin.register(mdata)
+class mdata(admin.ModelAdmin):
+    list_display = [field.name for field in mdata._meta.get_fields()]
 
 @admin.register(film)
 class films(admin.ModelAdmin):
