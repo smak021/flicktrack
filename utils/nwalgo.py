@@ -67,7 +67,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue):
         print(d1)
         show_url = requests.get('http://flicktracks.herokuapp.com/api/getshows/'+venue+'/'+d1+'/'+film_ID+'/')
         show_dict = json.loads(show_url.text)
-        for show in show_dict:
+        for count,show in enumerate(show_dict,start=1):
             print(show)
             print(show['show_id'])
             website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid='+venue+'&ssid='+show['show_id']+'&format=json'
@@ -88,7 +88,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue):
                     Current_date = date.today()
                     d1 = Current_date.strftime('%Y%m%d')
         cur_time=datetime_NY.strftime('%I:%M %p')
-        payload2 = {"show_date":show_date,"show_count":show_count,"film":film_ID,"theatre_code":venue,"theatre_location":fm_loc,"theatre_name":theatre_name,"category_name": category_name,"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"last_modified": cur_time}
+        payload2 = {"show_date":show_date,"show_count":count,"film":film_ID,"theatre_code":venue,"theatre_location":fm_loc,"theatre_name":theatre_name,"category_name": category_name.rstrip(':'),"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"last_modified": cur_time}
         putData = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+venue+'/'+d1+'/'+film_ID+'/',json=payload2, headers={'Content-type': 'application/json'})
         print(putData.status_code)
                  
@@ -143,15 +143,15 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
                 else:
                     offset_in = 0
                 print("Offset:", offset_in)
-                available_seat = (section['sAvail'] + offset_in)
-                if(available_seat>total_seat):
-                    available_seat = total_seat
-                available_seats += available_seat
-                booked_seat = total_seat-available_seat
+                available_seat = (section['sAvail'])
+                if(total_seat-available_seat < offset_in):
+                    offset_in = 0
+                available_seats += (available_seat + offset_in)
+                booked_seat = total_seat-(available_seat + offset_in)
                 price = price + (section['price'] * booked_seat)
                 print("Category Name:", category_name)
                 print("Total:",total_seat)
-                print("Available: ",available_seat)
+                print("Available: ",available_seat + offset_in)
                 print("Booked:",booked_seat)
                 print("Price",price)
                 cur_time=datetime_NY.strftime('%I:%M %p')  

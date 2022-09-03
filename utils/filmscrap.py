@@ -72,7 +72,8 @@ def bms_calc():
             payload2 = {"film_id":film_id,"is_tracking":True}
             payload1_json = json.dumps(payload1)
             url1=requests.put('http://flicktracks.herokuapp.com/api/putfilm/'+film_id+'/', json=payload1, headers={'Content-type': 'application/json'})
-            url2 = requests.put('http://flicktracks.herokuapp.com/api/status/',json=payload2,headers={'Content-type': 'application/json'})
+            # url2 = requests.put('http://flicktracks.herokuapp.com/api/status/',json=payload2,headers={'Content-type': 'application/json'})
+            print(url1.status_code)
             #print(url1.text)
 
 # TktNw Function
