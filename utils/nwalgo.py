@@ -27,6 +27,9 @@ def timesplit(time):
     return [tmhr,tmmin,tmampm]
 
 def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue):
+    venue_url=requests.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
+    vjson = json.loads(venue_url)
+    theatre_name = vjson['data']['venueName']
     print("---------------------------------------------")
     print("Film: ",film_namee)
     tz_NY = pytz.timezone('Asia/Kolkata')   
@@ -85,9 +88,6 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue):
                     Current_date = date.today()
                     d1 = Current_date.strftime('%Y%m%d')
         cur_time=datetime_NY.strftime('%I:%M %p')
-        venue_url=requests.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
-        vjson = json.loads(venue_url)
-        theatre_name = vjson['data']['venueName']
         payload2 = {"show_date":show_date,"show_count":show_count,"film":film_ID,"theatre_code":venue,"theatre_location":fm_loc,"theatre_name":theatre_name,"category_name": category_name,"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"last_modified": cur_time}
         putData = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+venue+'/'+d1+'/'+film_ID+'/',json=payload2, headers={'Content-type': 'application/json'})
         print(putData.status_code)
