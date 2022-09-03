@@ -255,7 +255,7 @@ def getbytheatre(request,filmid):
         # d = defaultdict(list)
         # data = mdata.objects.filter(film_id=filmid).order_by('theatre_name')
         # theatre_idList = data.values_list('theatre_code',flat=True).distinct()
-        url =requests.get('http://https://flicktracks.herokuapp.com/api/getData/'+filmid+'/?format=json')
+        url =requests.get('https://flicktracks.herokuapp.com/api/getData/'+filmid+'/?format=json')
         data = json.loads(url.text)
         uni = sorted(set(dic['theatre_code'] for dic in data))
         print(uni) 
