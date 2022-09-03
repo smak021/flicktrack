@@ -53,7 +53,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue):
             show_date = values['data-cut-off-date-time'][0:8]
             show_time = values['data-display-showtime']
             film_id = values['data-event-id']
-            print("ID:",session,'Date',show_date,"Venue: ",venue,"Show Time:",show_time,"Film ID",film_id,"Theatre Name",theatre_name)
+            print("ID:",session,'| Date:',show_date,"| Venue: ",venue,"| Show Time:",show_time,"| Film ID:",film_id,"| Theatre Name:",theatre_name)
             cur_time=datetime_NY.strftime('%I:%M %p')  
             payload = {"show_id": session,"show_time": show_time,"show_date": show_date,"screen_name": "NA","theatre_code": venue,"last_modified": cur_time,"film": film_id}
             putShow = requests.put('http://flicktracks.herokuapp.com/api/putshow/'+session+'/',json=payload, headers={'Content-type': 'application/json'})

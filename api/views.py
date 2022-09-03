@@ -1,8 +1,14 @@
+from dis import show_code
+import math
+from re import X
 from django.db.models.functions import Cast
 from django.db.models import IntegerField,Q,FloatField, Sum
 from rest_framework.decorators import api_view
 from rest_framework import generics,views
 from rest_framework.response import Response
+import requests
+from collections import defaultdict
+import json
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from django.views.decorators.csrf import csrf_exempt
@@ -35,6 +41,14 @@ def films(request):
             return JsonResponse(serializer.data)
         return JsonResponse(serializer.errors)
 
+
+@csrf_exempt
+def filterData(request,filmid):
+    if request.method == 'GET':
+        showData = mdata.objects.filter(film_id = filmid)
+        serializer = mdataserializer(showData , many = True)
+        return JsonResponse(serializer.data, safe=False)
+    
 
 @csrf_exempt
 def data(request):
@@ -235,24 +249,30 @@ def singleFilm(request,filmid):
 
 class TheatreData(views.APIView):
     def get(self,request,filmid):
-        data={}
         arr=[]
-        filmname = film.objects.filter(film_id=filmid).first().full_name
-        print(filmname)
-        theatre_idList = mdata.objects.filter(film_id=filmid).order_by('theatre_name').values_list('theatre_code',flat=True).distinct()
-        for row in theatre_idList:
-            print(row)
-            query = mdata.objects.filter(film_id=filmid, theatre_code=row)
-            theatre_name = query.first().theatre_name
-            theatre_location = track.objects.filter(theatre_code = row).first().loc_real_name
-            show_count = query.annotate(s_count=Cast('show_count', IntegerField())).aggregate(Sum('show_count'))["show_count__sum"]    
-            test_booked = query.annotate(booked_seat=Cast('booked_seats', IntegerField())).aggregate(Sum('booked_seat'))
-            test_amount = query.annotate(booked_seat=Cast('booked_seats', IntegerField()),amount = Cast('price',FloatField())).aggregate(total=Sum('amount',output_field=IntegerField()))
-            test_total = query.annotate(t_seat=Cast('total_seats', IntegerField())).aggregate(Sum('t_seat'))
-            val = {"name": filmname,'theatre_code':row,'theatre_name':theatre_name,'theatre_location':theatre_location.capitalize(),'shows':show_count,"booked_seats":test_booked['booked_seat__sum'],"total_seats":test_total["t_seat__sum"],'total_amount':test_amount["total"]}
-            arr.append(val)
-            data = arr
-        return Response(data)
+        row={}
+        d = defaultdict(list)
+        url =requests.get('http://127.0.0.1:8000/api/getData/'+filmid+'/?format=json')
+        data = json.loads(url.text)
+        uni = sorted(set(dic['theatre_code'] for dic in data))
+        print(uni) 
+        for item in uni:
+            print(item)
+            dsf = [val for val in data if val['theatre_code'] == item]
+            total=0
+            booked=0
+            avail=0
+            price=0
+            show_count=0
+            for item2 in dsf:
+                total += int(item2['total_seats'])
+                avail += int(item2['available_seats']) 
+                booked += int(item2['booked_seats'])
+                price += float(item2['price'])
+                show_count += int(item2['show_count'])
+            nwdata = {'show_count': show_count, 'category_name': dsf[0]['category_name'], 'price': math.floor(price), 'booked_seats': booked, 'available_seats': avail, 'total_seats': total, 'theatre_code': item, 'theatre_location': dsf[0]['theatre_location'], 'theatre_name': dsf[0]['theatre_name'], 'last_modified': dsf[0]['last_modified'], 'film': dsf[0]['film']}
+            arr.append(nwdata)
+        return Response(arr)
 
 
 
@@ -328,3 +348,22 @@ def getShows(request,theatrecode, date,filmid):
         serializer = showserializer(queryset , many = True)
         return JsonResponse(serializer.data, safe=False)
 
+
+ # --------------------------------------------------
+        # METHOD1 databytheatre old
+        # data={}
+        # arr=[]
+        # filmname = film.objects.filter(film_id=filmid).first().full_name
+        # print(filmname)
+        # theatre_idList = mdata.objects.filter(film_id=filmid).order_by('theatre_name').values_list('theatre_code',flat=True).distinct()
+        # for row in theatre_idList:
+        #     print(row)
+        #     query = mdata.objects.filter(film_id=filmid, theatre_code=row)
+        #     theatre_name = query.first().theatre_name
+        #     # theatre_location = track.objects.filter(theatre_code = row).first().loc_real_name
+        #     show_count = query.annotate(s_count=Cast('show_count', IntegerField())).aggregate(Sum('show_count'))["show_count__sum"]    
+        #     test_booked = query.annotate(booked_seat=Cast('booked_seats', IntegerField())).aggregate(Sum('booked_seat'))["booked_seat__sum"]
+        #     test_amount = query.annotate(amount = Cast('price',FloatField())).aggregate(Sum('amount',output_field=IntegerField()))["amount__sum"]
+        #     test_total = query.annotate(t_seat=Cast('total_seats', IntegerField())).aggregate(Sum('t_seat'))["t_seat__sum"]
+        #     val = {"name": filmname,'theatre_code':row,'theatre_name':theatre_name,'theatre_location':"theatre_location.capitalize()",'shows':show_count,"booked_seats":test_booked,"total_seats":test_total,'total_amount':test_amount}
+        #     arr.append(val)
