@@ -1,4 +1,3 @@
-from turtle import pu
 from django.contrib import admin
 from django.urls import path
 from api.views import EndPoint, TheatreData,putShow,nw_putData,getShows,snippet_detail, filterfilm, films, singleFilm, tracks, data, filmlist, putData,ReportApi,statuss

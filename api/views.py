@@ -1,5 +1,5 @@
 from django.db.models.functions import Cast
-from django.db.models import IntegerField,Q,FloatField, Sum, F
+from django.db.models import IntegerField,Q,FloatField, Sum
 from rest_framework.decorators import api_view
 from rest_framework import generics,views
 from rest_framework.response import Response
