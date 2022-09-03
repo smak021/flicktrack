@@ -247,9 +247,8 @@ def singleFilm(request,filmid):
         return JsonResponse(serializer.errors)
 
 
-class TheatreData(views.APIView):
-    def get(self,request,filmid):
-
+@api_view(['GET'])
+def getbytheatre(request,filmid):
         # data = mdata.objects.filter(film_id=filmid).values('theatre_code').order_by('theatre_code').values('theatre_code','price','film_id','category_name').distinct('theatre_code')
         arr=[]
         # nwdata ={}
@@ -277,6 +276,7 @@ class TheatreData(views.APIView):
             # print(dsf)
             nwdata = {'show_count': show_count, 'category_name': dsf[0]['category_name'], 'price': math.floor(price), 'booked_seats': booked, 'available_seats': avail, 'total_seats': total, 'theatre_code': item, 'theatre_location': dsf[0]['theatre_location'], 'theatre_name': dsf[0]['theatre_name'], 'last_modified': dsf[0]['last_modified'], 'film': dsf[0]['film']}
             arr.append(nwdata)
+
         return Response(arr)
 
 
