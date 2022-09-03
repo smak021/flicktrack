@@ -33,7 +33,7 @@ class status(models.Model):
 class mdata(models.Model):
     id = models.AutoField(auto_created=True,primary_key=True)
     show_date = models.CharField(max_length=50)
-    show_count = models.IntegerField(max_length=20,default=0)
+    show_count = models.IntegerField(default=0)
     category_name = models.CharField(max_length=50,blank=True)
     price = models.CharField(max_length=50,blank=True)
     booked_seats = models.CharField(max_length=50,default="0")

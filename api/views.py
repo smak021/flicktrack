@@ -252,7 +252,8 @@ class TheatreData(views.APIView):
 
         # data = mdata.objects.filter(film_id=filmid).values('theatre_code').order_by('theatre_code').values('theatre_code','price','film_id','category_name').distinct('theatre_code')
         arr=[]
-        d = defaultdict(list)
+        # nwdata ={}
+        # d = defaultdict(list)
         # data = mdata.objects.filter(film_id=filmid).order_by('theatre_name')
         # theatre_idList = data.values_list('theatre_code',flat=True).distinct()
         url =requests.get('http://127.0.0.1:8000/api/getData/'+filmid+'/?format=json')
@@ -260,7 +261,7 @@ class TheatreData(views.APIView):
         uni = sorted(set(dic['theatre_code'] for dic in data))
         print(uni) 
         for item in uni:
-            print(item)
+            # print(item)
             dsf = [val for val in data if val['theatre_code'] == item]
             total=0
             booked=0
@@ -273,11 +274,10 @@ class TheatreData(views.APIView):
                 booked += int(item2['booked_seats'])
                 price += float(item2['price'])
                 show_count += int(item2['show_count'])
-            print(dsf)
+            # print(dsf)
             nwdata = {'show_count': show_count, 'category_name': dsf[0]['category_name'], 'price': math.floor(price), 'booked_seats': booked, 'available_seats': avail, 'total_seats': total, 'theatre_code': item, 'theatre_location': dsf[0]['theatre_location'], 'theatre_name': dsf[0]['theatre_name'], 'last_modified': dsf[0]['last_modified'], 'film': dsf[0]['film']}
             arr.append(nwdata)
-        data = {"data":arr}
-        return JsonResponse(data)
+        return Response(arr)
 
 
 class EndPoint(views.APIView):
