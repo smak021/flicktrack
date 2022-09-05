@@ -216,7 +216,7 @@ def filmlist(request,filmid):
         pdata = JSONParser().parse(request)
         serializer = filmserializer(film_data, data=request.data)
         if serializer.is_valid():
-            serializer.save(commit=False)
+            serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

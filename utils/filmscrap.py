@@ -16,7 +16,7 @@ def bms_calc():
         requests.adapters.DEFAULT_RETRIES = 5
         url = requests.post('https://in.bookmyshow.com/pwa/api/uapi/movies',data=payload ,headers={'content-type':'application/json'}).text 
         url_json = json.loads(url)
-        substring = 'bookmyshow.com'
+        substring = 'email protected'
         for i in url_json["nowShowing"]["arrEvents"]:
             film_name = str(i["ChildEvents"][0]['EventURL'])
             film_real_name=str(i["ChildEvents"][0]['EventName'])
@@ -32,7 +32,7 @@ def bms_calc():
             storyurl = requests.get("https://in.bookmyshow.com/"+loc+"/movies/"+film_name+"/"+film_id)
             html = BeautifulSoup(storyurl.content,"html.parser")
             query = html.find("section",id="component-1")
-            film_story = query.span.span.string
+            film_story = query.span.span.text
             #end of scrap
             #scrap cast n crew
             actors=[]
@@ -65,7 +65,7 @@ def bms_calc():
             castncrew = {'actors':actors,'crews':crew}
             jsoncastncrew = json.dumps(castncrew)
             # end cast n crew scrap
-            if film_story!= None and substring in film_story:
+            if (film_story!= None and substring in film_story) or film_story == None:
                 film_story='Not Available'
             print(film_loc)
             payload1={"film_id":film_id,"film_name": film_name, "cover_url":image_url, "release_date": release_date,"film_story":film_story,"film_genre":film_genre,"film_censor":film_censor,"film_duration":film_length,"full_name":film_real_name,"cast_n_crew":jsoncastncrew}
@@ -74,6 +74,7 @@ def bms_calc():
             url1=requests.put('http://flicktracks.herokuapp.com/api/putfilm/'+film_id+'/', json=payload1, headers={'Content-type': 'application/json'})
             # url2 = requests.put('http://flicktracks.herokuapp.com/api/status/',json=payload2,headers={'Content-type': 'application/json'})
             print(url1.status_code)
+            
             #print(url1.text)
 
 # TktNw Function

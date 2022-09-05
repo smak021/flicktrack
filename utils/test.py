@@ -11,13 +11,21 @@ from difflib import SequenceMatcher
 
 # BMS Efficient
 
+storyurl = requests.get("https://in.bookmyshow.com/koch/movies/brahmastra-3d-hindi/ET00337403")
+html = BeautifulSoup(storyurl.content,"html.parser")
+query = html.find("section",id="component-1")
+film_story = query.span.span.string
+print(query.span.span.text)
+# print(film_story)
 
-arr=['235','43432','4355']
-test=''
-for ser in [1,2]:
-    for count,item in enumerate(arr,start=1):
-        print(item)
-    print(count)
+# {'film_id': 'ET00337403', 'film_name': 'brahmastra-3d-hindi', 'cover_url': 'brahmastra-et00337403-1661162326', 'release_date': '2022-09-09', 'film_story': None, 'film_genre': 'Action|Adventure|Fantasy', 'film_censor': 'UA', 'film_duration': '2 hrs 47 mins', 'full_name': 'Brahmastra (3D Hindi)', 'cast_n_crew': '{"actors": ["Ranbir Kapoor", "Alia Bhatt", "Amitabh Bachchan", "Dimple Kapadia", "Divyendu Sharma", "Mouni Roy", "NA"], "crews": ["Ayan Mukerji", "Pritam Chakraborty", "NA"]}'}
+
+# arr=['235','43432','4355']
+# test=''
+# for ser in [1,2]:
+#     for count,item in enumerate(arr,start=1):
+#         print(item)
+#     print(count)
 
 # for n in arr:
 #     test = ':'.join([n,test])
