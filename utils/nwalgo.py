@@ -29,9 +29,12 @@ def timesplit(time):
 def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue):
     print("---------------------------------------------")
     print("Venue",venue)
-    venue_url=requests.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
-    vjson = json.loads(venue_url)
-    theatre_name = vjson['data']['venueName']
+    try:
+        venue_url=requests.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
+        vjson = json.loads(venue_url)
+        theatre_name = vjson['data']['venueName']
+    except:
+        theatre_name = venue
     print("Film: ",film_namee)
     tz_NY = pytz.timezone('Asia/Kolkata')   
     datetime_NY = datetime.now(tz_NY)
