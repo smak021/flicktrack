@@ -346,7 +346,7 @@ def putShow(request,showid):
 @csrf_exempt
 def getShows(request,theatrecode, date,filmid):
     if request.method == 'GET':
-        queryset = show.objects.filter(theatre_code__exact = theatrecode, show_date__exact = date,film_id__exact=filmid)
+        queryset = show.objects.filter(theatre_code__exact = theatrecode, show_date__gte = date,film_id__exact=filmid)
         serializer = showserializer(queryset , many = True)
         return JsonResponse(serializer.data, safe=False)
 
