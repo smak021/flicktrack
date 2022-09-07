@@ -1,9 +1,9 @@
+from django.contrib import messages
+from django.utils.translation import ngettext
 from django.contrib import admin
 from .models import mdata,film,track,show
 #from .models import ft_data, film_det,film_loc
 # from .models import film, show, track
-
-
 
 # Register your models here.
 @admin.register(show)
@@ -17,6 +17,26 @@ class mdata(admin.ModelAdmin):
 @admin.register(film)
 class films(admin.ModelAdmin):
     list_display=['film_id','full_name','release_date','film_status','tn_code','ptm_code']
+    actions= ['make_inactive','make_active']
+
+    @admin.action(description='Mark film status as inactive')
+    def make_inactive(self,request,queryset):
+        updated=queryset.update(film_status='inactive')
+        self.message_user(request,ngettext(
+        '%d status was successfully marked as active.',
+        '%d statuses were successfully marked as active.',
+        updated,
+        )% updated, messages.SUCCESS)
+
+    @admin.action(description='Mark film status as active')
+    def make_active(self,request,queryset):
+        updated = queryset.update(film_status='active')
+        self.message_user(request,ngettext(
+            '%d status was successfully marked as active.',
+            '%d statuses were successfully marked as active.',
+            updated,
+        )% updated, messages.SUCCESS)
+
        
 @admin.register(track)
 class track(admin.ModelAdmin):

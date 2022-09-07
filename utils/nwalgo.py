@@ -92,7 +92,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue):
                     screen_name = screen_name+urll['ScreenName']+ ":"
                     Current_date = date.today()
                     d1 = Current_date.strftime('%Y%m%d')
-        cur_time=datetime_NY.strftime('%I:%M %p')
+        cur_time=datetime_NY.strftime('%Y/%m/%d %I:%M %p')
         payload2 = {"show_date":show_date,"show_count":count,"film":film_ID,"theatre_code":venue,"theatre_location":fm_loc,"theatre_name":theatre_name,"category_name": category_name.rstrip(':'),"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"last_modified": cur_time}
         putData = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+venue+'/'+show_date+'/'+film_ID+'/',json=payload2, headers={'Content-type': 'application/json'})
         print(putData.status_code)
@@ -159,7 +159,7 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
                 print("Available: ",available_seat + offset_in)
                 print("Booked:",booked_seat)
                 print("Price",price)
-                cur_time=datetime_NY.strftime('%I:%M %p')  
+                cur_time=datetime_NY.strftime('%Y/%m/%d %I:%M %p')  
         if(show_count != 0):
             print("Shows",show_count)
             payload ={"show_date": ptm_date,"show_count":show_count,"category_name": category_name,"theatre_name":theatre_name,"price": price,"booked_seats": total_seats-available_seats,"available_seats": available_seats,"total_seats": total_seats,"theatre_code": theatre_code,"theatre_location": city,"last_modified": cur_time,"film": bm_id}

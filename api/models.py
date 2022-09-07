@@ -3,6 +3,12 @@ from django.db import models
 # Create your models here.
 #New Simple Table
 
+STATUS_CHOICE = [
+    ('active','Active'),
+    ('inactive','Inactive'),
+    ('stopped','Stopped')
+]
+
 
 class film(models.Model):
     film_id = models.CharField(max_length=50, primary_key=True)
@@ -14,7 +20,7 @@ class film(models.Model):
     film_censor = models.CharField(max_length=50)
     film_duration = models.CharField(max_length=50)
     full_name = models.CharField(max_length=50)
-    film_status = models.CharField(max_length=30,default="active")
+    film_status = models.CharField(max_length=30,default="active",choices=STATUS_CHOICE)
     cast_n_crew = models.CharField(max_length=1000)
     tn_code = models.CharField(max_length=50,default="NA")
     ptm_code = models.CharField(max_length=50, default="NA")

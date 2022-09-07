@@ -1,13 +1,13 @@
-from dis import show_code
 import math
-from re import X
+from datetime import datetime, timedelta
+import pytz
+from urllib import response
 from django.db.models.functions import Cast
 from django.db.models import IntegerField,Q,FloatField, Sum
 from rest_framework.decorators import api_view
 from rest_framework import generics,views
 from rest_framework.response import Response
 import requests
-from collections import defaultdict
 import json
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
@@ -343,14 +343,25 @@ def putShow(request,showid):
         showData.delete()
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
-@csrf_exempt
-def getShows(request,theatrecode, date,filmid):
-    if request.method == 'GET':
+# @csrf_exempt
+# def getShows(request,theatrecode, date,filmid):
+#     if request.method == 'GET':
+#         queryset = show.objects.filter(theatre_code__exact = theatrecode, show_date__gte = date,film_id__exact=filmid)
+#         serializer = showserializer(queryset , many = True)
+#         return JsonResponse(serializer.data, safe=False)
+
+@api_view(['GET'])
+def getShow(request,theatrecode, date,filmid):
+    release_date = film.objects.filter(film_id__exact = filmid).first().release_date
+    relDate = datetime.strptime(release_date,'%Y-%m-%d')
+    todDate = datetime.strptime(date,'%Y%m%d')
+    res = relDate-todDate
+    if(res.days > 0):
         queryset = show.objects.filter(theatre_code__exact = theatrecode, show_date__gte = date,film_id__exact=filmid)
-        serializer = showserializer(queryset , many = True)
-        return JsonResponse(serializer.data, safe=False)
-
-
+    else:
+        queryset = show.objects.filter(theatre_code__exact = theatrecode, show_date__exact = date,film_id__exact=filmid)
+    serializer = showserializer(queryset , many = True)
+    return JsonResponse(serializer.data, safe=False)
  # --------------------------------------------------
         # METHOD1 databytheatre old
         # data={}
