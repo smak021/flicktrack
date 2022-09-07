@@ -17,14 +17,23 @@ class mdata(admin.ModelAdmin):
 @admin.register(film)
 class films(admin.ModelAdmin):
     list_display=['film_id','full_name','release_date','film_status','tn_code','ptm_code']
-    actions= ['make_inactive','make_active']
+    actions= ['make_inactive','make_active','make_stop']
+
+    @admin.action(description='Mark film status as stopped')
+    def make_stop(self,request,queryset):
+        updated=queryset.update(film_status='stopped')
+        self.message_user(request,ngettext(
+        '%d status was successfully marked as stopped.',
+        '%d statuses were successfully marked as stopped.',
+        updated,
+        )% updated, messages.SUCCESS)
 
     @admin.action(description='Mark film status as inactive')
     def make_inactive(self,request,queryset):
         updated=queryset.update(film_status='inactive')
         self.message_user(request,ngettext(
-        '%d status was successfully marked as active.',
-        '%d statuses were successfully marked as active.',
+        '%d status was successfully marked as inactive.',
+        '%d statuses were successfully marked as inactive.',
         updated,
         )% updated, messages.SUCCESS)
 
