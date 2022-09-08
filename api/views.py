@@ -380,9 +380,12 @@ def topweek(request,date1,date2):
     query_sum = mdata.objects.filter(show_date__gte = date1, show_date__lte = date2,film_id__in = films).order_by('film_id').annotate(pri = Cast('price',FloatField())).annotate(total_price=Sum(F('pri'),output_field=FloatField()))
 
     for item in films:
-        film_name = film.objects.filter(film_id__exact = item).first().full_name
+        fildata = film.objects.filter(film_id__exact = item).first()
+        film_name = fildata.full_name
+        film_cover = fildata.cover_url
+        release_date = fildata.release_date
         query_sum = mdata.objects.filter(show_date__gte = date1, show_date__lte = date2,film_id = item).order_by('film_id').annotate(pri = Cast('price',FloatField())).aggregate(total_price=Sum(F('pri'),output_field=IntegerField()))['total_price']
-        value = {"film_id":item,"total":query_sum,"film_name":film_name}
+        value = {"film_id":item,"total":query_sum,"film_name":film_name,"cover_pic":film_cover,"release_date":release_date}
         arr.append(value)
     dict_data = arr
     dict_data = sorted(dict_data, key=lambda x:x['total'],reverse=True)[:5]
