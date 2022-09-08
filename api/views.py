@@ -382,7 +382,7 @@ def topweek(request,date1,date2):
     for item in films:
         film_name = film.objects.filter(film_id__exact = item).first().full_name
         query_sum = mdata.objects.filter(show_date__gte = date1, show_date__lte = date2,film_id = item).order_by('film_id').annotate(pri = Cast('price',FloatField())).aggregate(total_price=Sum(F('pri'),output_field=IntegerField()))['total_price']
-        value = {"film_id":item,"total":query_sum,"film name":film_name}
+        value = {"film_id":item,"total":query_sum,"film_name":film_name}
         arr.append(value)
     dict_data = arr
     dict_data = sorted(dict_data, key=lambda x:x['total'],reverse=True)[:5]
@@ -392,7 +392,7 @@ def topweek(request,date1,date2):
                 print(row)
                 query = mdata.objects.filter(film_id=item2['film_id'], show_date=row)
                 amount = query.annotate(booked_seat=Cast('booked_seats', IntegerField()),amount = Cast('price',FloatField())).aggregate(total=Sum('amount',output_field=IntegerField()))["total"]
-                topdata.append({"film_id": item2['film_id'],'film_name':film_name,'date':row,'total_amount':amount})
+                topdata.append({"film_id": item2['film_id'],'date':row,'total_amount':amount})
     final_data = {"topdata":topdata,"toptotal":dict_data}       
                 
     # print(topfive)
