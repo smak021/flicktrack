@@ -9,7 +9,7 @@ urlpatterns = [
   path('porgdata/<str:theatrecode>/<str:date>/<str:filmid>/',nw_putData),
   path('putshow/<str:showid>/',putShow),
   path('getshows/<str:theatrecode>/<str:date>/<str:filmid>/',getShow),
-  path('topweek/<str:date1>/<str:date2>/',topweek),
+  path('topweek/<int:type>/',topweek),
   path('films/',films),
   # path('testfilms/',FilmListView.as_view()),
   path('upfilm/<str:pk>',snippet_detail),

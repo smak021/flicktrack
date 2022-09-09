@@ -372,31 +372,47 @@ def getShow(request,theatrecode, date,filmid):
     return JsonResponse(serializer.data, safe=False)
 
 @api_view(['GET'])
-def topweek(request,date1,date2):
+def topweek(request,type):
+    dateFormat = '%Y%m%d'
+    tz_NY = pytz.timezone('Asia/Kolkata')   
+    datetime_NY = datetime.now(tz_NY)
+    if(type == 1):
+        day = datetime_NY.weekday()
+        if(day<3):
+            offset = 4 + day 
+        else:
+            offset = day - 3
+        datetwo = (datetime_NY - timedelta(days=offset))
+        dateone = (datetwo-timedelta(days=6)).strftime(dateFormat)
+        datetwo = datetwo.strftime(dateFormat)
+    elif(type == 0):
+        dateone = film.objects.all().order_by('release_date').first().release_date
+        read_date = datetime.strptime(dateone,'%Y-%m-%d').strftime('%Y%m%d')
+        dateone = read_date
+        datetwo = datetime_NY.strftime(dateFormat)
     dict_data = {}
     final_data={}
     arr=[]
-    films = mdata.objects.filter(show_date__gte = date1, show_date__lte = date2).values_list('film_id',flat=True).distinct()
-    query_sum = mdata.objects.filter(show_date__gte = date1, show_date__lte = date2,film_id__in = films).order_by('film_id').annotate(pri = Cast('price',FloatField())).annotate(total_price=Sum(F('pri'),output_field=FloatField()))
+    films = mdata.objects.filter(show_date__gte = dateone, show_date__lte = datetwo).values_list('film_id',flat=True).distinct()
+    query_sum = mdata.objects.filter(show_date__gte = dateone, show_date__lte = datetwo,film_id__in = films).order_by('film_id').annotate(pri = Cast('price',FloatField())).annotate(total_price=Sum(F('pri'),output_field=FloatField()))
 
     for item in films:
         fildata = film.objects.filter(film_id__exact = item).first()
         film_name = fildata.full_name
         film_cover = fildata.cover_url
         release_date = fildata.release_date
-        query_sum = mdata.objects.filter(show_date__gte = date1, show_date__lte = date2,film_id = item).order_by('film_id').annotate(pri = Cast('price',FloatField())).aggregate(total_price=Sum(F('pri'),output_field=IntegerField()))['total_price']
+        query_sum = mdata.objects.filter(show_date__gte = dateone, show_date__lte = datetwo,film_id = item).order_by('film_id').annotate(pri = Cast('price',FloatField())).aggregate(total_price=Sum(F('pri'),output_field=IntegerField()))['total_price']
         value = {"film_id":item,"total":query_sum,"film_name":film_name,"cover_pic":film_cover,"release_date":release_date}
         arr.append(value)
     dict_data = arr
     dict_data = sorted(dict_data, key=lambda x:x['total'],reverse=True)[:5]
     topdata=[]
     for item2 in dict_data:     
-        for row in mdata.objects.filter(show_date__gte = date1, show_date__lte = date2,film_id=item2['film_id']).order_by('-show_date').values_list('show_date',flat=True).distinct():
-                print(row)
+        for row in mdata.objects.filter(show_date__gte = dateone, show_date__lte = datetwo,film_id=item2['film_id']).order_by('-show_date').values_list('show_date',flat=True).distinct():
                 query = mdata.objects.filter(film_id=item2['film_id'], show_date=row)
                 amount = query.annotate(booked_seat=Cast('booked_seats', IntegerField()),amount = Cast('price',FloatField())).aggregate(total=Sum('amount',output_field=IntegerField()))["total"]
                 topdata.append({"film_id": item2['film_id'],'date':row,'total_amount':amount})
-    final_data = {"topdata":topdata,"toptotal":dict_data}       
+    final_data = {"from":dateone,"to":datetwo,"topdata":topdata,"toptotal":dict_data}       
                 
     # print(topfive)
     # data = mdata.objects.filter(show_date__gte = date1, show_date__lte = date2,film_id__in = topfive).order_by('film_id','show_date')
