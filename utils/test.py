@@ -8,14 +8,32 @@ from datetime import date
 import pytz
 from datetime import datetime, timedelta
 from difflib import SequenceMatcher
+import cloudscraper
 
 # BMS Efficient
 
-storyurl = requests.get("https://in.bookmyshow.com/koch/movies/brahmastra-3d-hindi/ET00337403")
-html = BeautifulSoup(storyurl.content,"html.parser")
-query = html.find("section",id="component-1")
-film_story = query.span.span.string
-print(query.span.span.text)
+scrapper = cloudscraper.create_scraper()
+
+website = 'https://in.bookmyshow.com/buytickets/vendhu-thanindhathu-kaadu-trivandrum/movie-triv-ET00329382-MT/20220915'
+try:
+    page = scrapper.get(website)
+    soup = BeautifulSoup(page.content, "html.parser")
+    ssid = soup.find_all('a',{'data-session-id':True,'data-venue-code':'DSTA'},class_='showtime-pill')
+    # print(ssid)
+except :
+    print("Not found")
+    ssid = False
+if(ssid):
+    for values in ssid:
+        session = values['data-session-id']
+        print(session)
+
+
+# storyurl = requests.get("https://in.bookmyshow.com/koch/movies/brahmastra-3d-hindi/ET00337403")
+# html = BeautifulSoup(storyurl.content,"html.parser")
+# query = html.find("section",id="component-1")
+# film_story = query.span.span.string
+# print(query.span.span.text)
 # print(film_story)
 
 # {'film_id': 'ET00337403', 'film_name': 'brahmastra-3d-hindi', 'cover_url': 'brahmastra-et00337403-1661162326', 'release_date': '2022-09-09', 'film_story': None, 'film_genre': 'Action|Adventure|Fantasy', 'film_censor': 'UA', 'film_duration': '2 hrs 47 mins', 'full_name': 'Brahmastra (3D Hindi)', 'cast_n_crew': '{"actors": ["Ranbir Kapoor", "Alia Bhatt", "Amitabh Bachchan", "Dimple Kapadia", "Divyendu Sharma", "Mouni Roy", "NA"], "crews": ["Ayan Mukerji", "Pritam Chakraborty", "NA"]}'}

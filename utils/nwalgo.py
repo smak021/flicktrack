@@ -28,9 +28,9 @@ def timesplit(time):
     return [tmhr,tmmin,tmampm]
 
 
-
-def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,scrapper):
+def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
     print("---------------------------------------------")
+    scrapper = cloudscraper.create_scraper()
     print("Venue",venue)
     try:
         venue_url=scrapper.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
@@ -85,10 +85,25 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,scrapper):
                 category_name = ''
                 data = json.loads(url2)
                 for urll in data['BookMyShow']['arrShowInfo']:
+                    tot_seat = int(urll['TotalSeats'])
+                    avail_seat = int(urll['AvailableSeats'])
                     total_seat+=int(urll['TotalSeats'])
-                    available_seat+= int(urll['AvailableSeats'])
+                    if(offset!='na'):
+                        ind_offset = offset.rsplit(',')
+                        for roffset in ind_offset:
+                            offset_splt = roffset.rsplit(':')
+                            if(offset_splt[0]==category_name):
+                                offset_in = int(offset_splt[1])
+                                break
+                            else:
+                                offset_in = 0
+                    else:
+                        offset_in = 0
+                    if(tot_seat-avail_seat < offset_in):
+                        offset_in = 0
+                    available_seat+= avail_seat + offset_in
                     show_date=urll['ShowDateCode']
-                    booked_seat += int(urll['TotalSeats'])-int(urll['AvailableSeats'])
+                    booked_seat += tot_seat-(avail_seat+offset_in)
                     price = price + (float(urll['Price']) * (int(urll['TotalSeats'])-int(urll['AvailableSeats'])))
                     category_name= category_name+urll['CategoryName']+":"
                     print(category_name)
@@ -172,7 +187,6 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
 
 film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
 film_data_json = json.loads(film_data)
-scrapper = cloudscraper.create_scraper()
 locData = requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
 locData_json = json.loads(locData)
 for film in film_data_json:
@@ -180,7 +194,7 @@ for film in film_data_json:
         for loc in locData_json:
             if (loc['is_currently_tracking']!='no' or loc['is_currently_tracking']!='N'):
                 if(loc['source']=='bms'):
-                    new_algo_bm(film['film_name'],film['film_id'],loc['track_location'],loc['loc_real_name'],loc['theatre_code'],scrapper)
+                    new_algo_bm(film['film_name'],film['film_id'],loc['track_location'],loc['loc_real_name'],loc['theatre_code'],loc['offset_check'])
                 if(film['ptm_code']!='NA') and (loc['source']=='ptm'):
                     new_algo_ptm(film['ptm_code'],loc['theatre_code'],loc['track_location'], film['film_id'],loc['offset_check'])
 
