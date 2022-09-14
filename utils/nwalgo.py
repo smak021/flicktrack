@@ -6,6 +6,7 @@ import json
 from datetime import date
 from bs4 import BeautifulSoup
 import pytz
+import cloudscraper
 # from api.views import mainData
 
 # bm
@@ -26,11 +27,13 @@ def timesplit(time):
     tmampm=time.rsplit(' ',1)[-1]
     return [tmhr,tmmin,tmampm]
 
-def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue):
+
+
+def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,scrapper):
     print("---------------------------------------------")
     print("Venue",venue)
     try:
-        venue_url=requests.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
+        venue_url=scrapper.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
         vjson = json.loads(venue_url)
         theatre_name = vjson['data']['venueName']
     except:
@@ -42,7 +45,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue):
     print("Iteration Start")
     website = 'https://in.bookmyshow.com/buytickets/'+film_namee+'-'+loc_slug+'/movie-'+fm_loc.lower()+'-'+film_ID+'-MT/'+d1
     try:
-        page = requests.get(website)
+        page = scrapper.get(website)
         soup = BeautifulSoup(page.content, "html.parser")
         ssid = soup.find_all('a',{'data-session-id':True,'data-venue-code':venue},class_='showtime-pill')
     except :
@@ -76,7 +79,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue):
             print(show)
             print(show['show_id'])
             website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid='+venue+'&ssid='+show['show_id']+'&format=json'
-            url2 = requests.get(website2).text
+            url2 = scrapper.get(website2).text
             if(url2):
                 screen_name =''
                 category_name = ''
@@ -169,6 +172,7 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
 
 film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
 film_data_json = json.loads(film_data)
+scrapper = cloudscraper.create_scraper()
 locData = requests.get('http://flicktracks.herokuapp.com/api/tracks/').text
 locData_json = json.loads(locData)
 for film in film_data_json:
@@ -176,7 +180,7 @@ for film in film_data_json:
         for loc in locData_json:
             if (loc['is_currently_tracking']!='no' or loc['is_currently_tracking']!='N'):
                 if(loc['source']=='bms'):
-                    new_algo_bm(film['film_name'],film['film_id'],loc['track_location'],loc['loc_real_name'],loc['theatre_code'])
+                    new_algo_bm(film['film_name'],film['film_id'],loc['track_location'],loc['loc_real_name'],loc['theatre_code'],scrapper)
                 if(film['ptm_code']!='NA') and (loc['source']=='ptm'):
                     new_algo_ptm(film['ptm_code'],loc['theatre_code'],loc['track_location'], film['film_id'],loc['offset_check'])
 
