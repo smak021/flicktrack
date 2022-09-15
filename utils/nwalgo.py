@@ -185,7 +185,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
                         ind_offset = offset.rsplit(',')
                         for roffset in ind_offset:
                             offset_splt = roffset.rsplit(':')
-                            if(offset_splt[0]==category_name):
+                            if(offset_splt[0]==urll['ScreenName']):
                                 offset_in = int(offset_splt[1])
                                 break
                             else:
