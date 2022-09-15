@@ -1,3 +1,4 @@
+from os import sep
 from telnetlib import TN3270E
 from time import strptime
 import requests
@@ -10,23 +11,24 @@ from datetime import datetime, timedelta
 from difflib import SequenceMatcher
 import cloudscraper
 
+
 # BMS Efficient
 
-scrapper = cloudscraper.create_scraper()
+# scrapper = cloudscraper.create_scraper()
 
-website = 'https://in.bookmyshow.com/buytickets/vendhu-thanindhathu-kaadu-trivandrum/movie-triv-ET00329382-MT/20220915'
-try:
-    page = scrapper.get(website)
-    soup = BeautifulSoup(page.content, "html.parser")
-    ssid = soup.find_all('a',{'data-session-id':True,'data-venue-code':'DSTA'},class_='showtime-pill')
-    # print(ssid)
-except :
-    print("Not found")
-    ssid = False
-if(ssid):
-    for values in ssid:
-        session = values['data-session-id']
-        print(session)
+# website = 'https://in.bookmyshow.com/buytickets/vendhu-thanindhathu-kaadu-trivandrum/movie-triv-ET00329382-MT/20220915'
+# try:
+#     page = scrapper.get(website)
+#     soup = BeautifulSoup(page.content, "html.parser")
+#     ssid = soup.find_all('a',{'data-session-id':True,'data-venue-code':'DSTA'},class_='showtime-pill')
+#     # print(ssid)
+# except :
+#     print("Not found")
+#     ssid = False
+# if(ssid):
+#     for values in ssid:
+#         session = values['data-session-id']
+#         print(session)
 
 
 # storyurl = requests.get("https://in.bookmyshow.com/koch/movies/brahmastra-3d-hindi/ET00337403")

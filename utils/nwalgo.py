@@ -9,7 +9,6 @@ import pytz
 import cloudscraper
 # from api.views import mainData
 
-# bm
 def dateDiff(inputDate):
     tz_NY = pytz.timezone('Asia/Kolkata')   
     datetime_NY = datetime.now(tz_NY)
@@ -27,6 +26,100 @@ def timesplit(time):
     tmampm=time.rsplit(' ',1)[-1]
     return [tmhr,tmmin,tmampm]
 
+# ptm
+
+def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
+    theatre_name='NA'
+    print("---------------------------------------------")
+    tz_NY = pytz.timezone('Asia/Kolkata')   
+    datetime_NY = datetime.now(tz_NY)
+    today = datetime_NY.strftime('%Y%m%d')
+    url = "https://apiproxy.paytm.com/v3/movies/search/movie?meta=1&reqData=1&city="+city+"&movieCode="+code+"&version=3&site_id=1&channel=HTML5&child_site_id=1" 
+    data = requests.get(url).text
+    if(data):
+        json_data = json.loads(data)
+        show_count = 0 
+        try:
+            theatre = json_data['pageData']['sessions'][ptm_theatre_id]
+        except:
+            print("Show not found")
+            theatre = []
+        for row in theatre:
+            datee = row['showTime'].rsplit('T')[0].rsplit('-')
+            ptm_date = datee[0]+datee[1]+datee[2]
+            showcode = row['sid']
+            theatre_code = row['cid']
+            try:
+                screen_name = row['audi']
+                print("Screen: ",screen_name)
+            except KeyError:
+                screen_name='na'
+                print("not found")
+            print("Name:",json_data['meta']['movies'][0]['name'])
+            my_item = next((item for item in json_data['meta']['cinemas'] if item['id'] == int(ptm_theatre_id)), None)
+            theatre_name = my_item['name']
+            print(theatre_name)
+            total_seats = 0
+            available_seats = 0
+            price = 0
+            for section in row['areas']:
+                category_name = section['label']
+                total_seat = section['sTotal']
+                total_seats += total_seat
+                if(offset!='na'):
+                    ind_offset = offset.rsplit(',')
+                    for roffset in ind_offset:
+                        offset_splt = roffset.rsplit(':')
+                        if(offset_splt[0]==screen_name):
+                            offset_in = int(offset_splt[1])
+                            break
+                        else:
+                            offset_in = 0
+                else:
+                    offset_in = 0
+                print("Offset:", offset_in)
+                available_seat = (section['sAvail'])
+                if(total_seat-available_seat < offset_in):
+                    offset_in = 0
+                available_seats += (available_seat + offset_in)
+                booked_seat = total_seat-(available_seat + offset_in)
+                price = price + (section['price'] * booked_seat)
+                print("Category Name:", category_name)
+                print("Total:",total_seat)
+                print("Available: ",available_seat + offset_in)
+                print("Booked:",booked_seat)
+                print("Price",price)
+                cur_time=datetime_NY.strftime('%d/%m/%Y %I:%M %p')  
+            print(row['sid'],'----')
+            print("Shows",show_count)
+            payload = {"show_id": showcode,"show_time": 'NA',"show_date": ptm_date,"screen_name": str(available_seats)+":"+str(total_seats)+":"+str(price),"theatre_code": ptm_theatre_id,"last_modified": cur_time,"film": bm_id}
+            putShow = requests.put('http://flicktracks.herokuapp.com/api/putshow/'+showcode+'/',json=payload, headers={'Content-type': 'application/json'})
+            print("Status Code:",putShow.status_code)
+        # Section 2
+        print(theatre_name)
+        try:
+            show_url = requests.get('http://flicktracks.herokuapp.com/api/getshows/'+ptm_theatre_id+'/'+today+'/'+bm_id+'/')
+            show_dict = json.loads(show_url.text)
+        except:
+            print("Not exist")
+            show_dict=[]
+        count = 0
+        avail =0
+        total =0
+        amount =0
+        for count,show in enumerate(show_dict,start=1):
+            seperated = show['screen_name'].rsplit(':')
+            avail += int(seperated[0])
+            total += int(seperated[1])
+            amount += float(seperated[2])
+
+        if(count!=0):
+            payload ={"show_date": ptm_date,"show_count":count,"category_name": category_name,"theatre_name":theatre_name,"price": amount,"booked_seats": total-avail,"available_seats": avail,"total_seats": total,"theatre_code": theatre_code,"theatre_location": city,"last_modified": cur_time,"film": bm_id}
+            putt = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+str(theatre_code)+'/'+ptm_date+'/'+bm_id+'/',json=payload, headers={'Content-type': 'application/json'})
+            print("Status Code:",putt.status_code)
+
+
+# bm
 
 def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
     print("---------------------------------------------")
@@ -115,75 +208,6 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
         putData = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+venue+'/'+show_date+'/'+film_ID+'/',json=payload2, headers={'Content-type': 'application/json'})
         print(putData.status_code)
                  
-# ptm
-
-def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
-    print("------------------------------------------")
-    tz_NY = pytz.timezone('Asia/Kolkata')   
-    datetime_NY = datetime.now(tz_NY)
-    print("Entered",city,code)
-    url = "https://apiproxy.paytm.com/v3/movies/search/movie?meta=1&reqData=1&city="+city+"&movieCode="+code+"&version=3&site_id=1&channel=HTML5&child_site_id=1" 
-    data = requests.get(url).text
-    if(data):
-        json_data = json.loads(data)
-        show_count = 0 
-        total_seats = 0
-        available_seats = 0
-        price = 0
-        try:
-            theatre = json_data['pageData']['sessions'][ptm_theatre_id]
-        except:
-            print("Show not found")
-            theatre = []
-        for row in theatre:
-            show_count+=1
-            date = row['showTime'].rsplit('T')[0].rsplit('-')
-            ptm_date = date[0]+date[1]+date[2]
-            theatre_code = row['cid']
-            try:
-                screen_name = row['audi']
-                print("Screen: ",screen_name)
-            except KeyError:
-                screen_name='na'
-                print("not found")
-            print("Name:",json_data['meta']['movies'][0]['name'])
-            my_item = next((item for item in json_data['meta']['cinemas'] if item['id'] == int(ptm_theatre_id)), None)
-            theatre_name = my_item['name']
-            print(theatre_name)
-            for section in row['areas']:
-                category_name = section['label']
-                total_seat = section['sTotal']
-                total_seats += total_seat
-                if(offset!='na'):
-                    ind_offset = offset.rsplit(',')
-                    for roffset in ind_offset:
-                        offset_splt = roffset.rsplit(':')
-                        if(offset_splt[0]==screen_name):
-                            offset_in = int(offset_splt[1])
-                            break
-                        else:
-                            offset_in = 0
-                else:
-                    offset_in = 0
-                print("Offset:", offset_in)
-                available_seat = (section['sAvail'])
-                if(total_seat-available_seat < offset_in):
-                    offset_in = 0
-                available_seats += (available_seat + offset_in)
-                booked_seat = total_seat-(available_seat + offset_in)
-                price = price + (section['price'] * booked_seat)
-                print("Category Name:", category_name)
-                print("Total:",total_seat)
-                print("Available: ",available_seat + offset_in)
-                print("Booked:",booked_seat)
-                print("Price",price)
-                cur_time=datetime_NY.strftime('%d/%m/%Y %I:%M %p')  
-        if(show_count != 0):
-            print("Shows",show_count)
-            payload ={"show_date": ptm_date,"show_count":show_count,"category_name": category_name,"theatre_name":theatre_name,"price": price,"booked_seats": total_seats-available_seats,"available_seats": available_seats,"total_seats": total_seats,"theatre_code": theatre_code,"theatre_location": city,"last_modified": cur_time,"film": bm_id}
-            putt = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+str(theatre_code)+'/'+ptm_date+'/'+bm_id+'/',json=payload, headers={'Content-type': 'application/json'})
-            print(type(ptm_date),type(bm_id),type(theatre_code))
-            print("Status Code:",putt.status_code)
 
 film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
 film_data_json = json.loads(film_data)
