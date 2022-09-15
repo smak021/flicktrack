@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from api.views import EndPoint, filterData, getShow,getbytheatre,putShow,nw_putData,snippet_detail, filterfilm, films, singleFilm, topweek, tracks, data, filmlist, putData,ReportApi,statuss
+from api.views import EndPoint, clear_data, filterData, getShow,getbytheatre,putShow,nw_putData,snippet_detail, filterfilm, films, singleFilm, topweek, tracks, data, filmlist, putData,ReportApi,statuss
 
 
 urlpatterns = [
@@ -8,6 +8,7 @@ urlpatterns = [
   path('putdata/<str:showid>/<str:categoryname>/',putData),
   path('porgdata/<str:theatrecode>/<str:date>/<str:filmid>/',nw_putData),
   path('putshow/<str:showid>/',putShow),
+  path('safeclear/',clear_data),
   path('getshows/<str:theatrecode>/<str:date>/<str:filmid>/',getShow),
   path('topweek/<int:type>/',topweek),
   path('films/',films),

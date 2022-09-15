@@ -1,5 +1,6 @@
 import math
 from datetime import datetime, timedelta
+import stat
 import pytz
 from urllib import response
 from django.db.models.functions import Cast
@@ -370,6 +371,19 @@ def getShow(request,theatrecode, date,filmid):
         queryset = show.objects.filter(theatre_code__exact = theatrecode, show_date__exact = date,film_id__exact=filmid)
     serializer = showserializer(queryset , many = True)
     return JsonResponse(serializer.data, safe=False)
+
+
+@api_view(['GET'])
+def clear_data(request):
+    dateFormat = '%Y%m%d'
+    tz_NY = pytz.timezone('Asia/Kolkata')   
+    datetime_NY = datetime.now(tz_NY)
+    today = datetime_NY.strftime(dateFormat)
+    try:
+        query = show.objects.filter(show_date__lt = today).delete()
+        return JsonResponse({'Result':'Successfully completed'}, status=200)
+    except:
+        return Response({'Result':'Not found'},status=404)
 
 @api_view(['GET'])
 def topweek(request,type):
