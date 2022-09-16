@@ -16,8 +16,8 @@ class mdata(admin.ModelAdmin):
 
 @admin.register(film)
 class films(admin.ModelAdmin):
-    list_display=['film_id','full_name','release_date','film_status','tn_code','ptm_code']
-    actions= ['make_inactive','make_active','make_stop']
+    list_display=['film_id','full_name','release_date','film_status','tn_code','ptm_code','priority']
+    actions= ['make_inactive','make_active','make_stop','change_priority_low','change_priority_high']
 
     @admin.action(description='Mark film status as stopped')
     def make_stop(self,request,queryset):
@@ -47,7 +47,7 @@ class films(admin.ModelAdmin):
         )% updated, messages.SUCCESS)
 
     @admin.action(description='Change priority to high')
-    def change_priority(self,request,queryset):
+    def change_priority_high(self,request,queryset):
         updated = queryset.update(priority=1)
         self.message_user(request,ngettext(
             '(%d) Priority was successfully changed.',
@@ -56,7 +56,7 @@ class films(admin.ModelAdmin):
         )% updated, messages.SUCCESS)
 
     @admin.action(description='Change priority to low')
-    def change_priority(self,request,queryset):
+    def change_priority_low(self,request,queryset):
         updated = queryset.update(priority=0)
         self.message_user(request,ngettext(
             '(%d) Priority was successfully changed.',
