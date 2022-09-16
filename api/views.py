@@ -93,7 +93,7 @@ def statuss(request):
 @csrf_exempt
 def tracks(request):
     if request.method == 'GET':
-        trackData = track.objects.all()
+        trackData = track.objects.all().order_by('theatre_code')
         serializer = trackserializer(trackData , many = True)
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'PUT':

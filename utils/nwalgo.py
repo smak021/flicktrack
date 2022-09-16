@@ -86,7 +86,7 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
                 available_seat = (section['sAvail'])
                 if(total_seat-available_seat < offset_in):
                     offset_in = 0
-                if(available_seat + balancing + offset <= total_seat):
+                if(available_seat + balancing + offset_in <= total_seat):
                     offset_in += balancing
                 available_seats += (available_seat + offset_in)
                 booked_seat = total_seat-(available_seat + offset_in)
@@ -114,6 +114,7 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
     total =0
     amount =0
     for count,show in enumerate(show_dict,start=1):
+        date = show['show_date']
         seperated = show['screen_name'].rsplit(':')
         avail += int(seperated[0])
         total += int(seperated[1])
@@ -121,8 +122,8 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
 
     if(count!=0):
         try:
-            payload ={"show_date": ptm_date,"show_count":count,"category_name": category_name,"theatre_name":theatre_name,"price": amount,"booked_seats": total-avail,"available_seats": avail,"total_seats": total,"theatre_code": theatre_code,"theatre_location": city,"last_modified": cur_time,"film": bm_id}
-            putt = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+str(theatre_code)+'/'+ptm_date+'/'+bm_id+'/',json=payload, headers={'Content-type': 'application/json'})
+            payload ={"show_date": date,"show_count":count,"category_name": category_name,"theatre_name":theatre_name,"price": amount,"booked_seats": total-avail,"available_seats": avail,"total_seats": total,"theatre_code": theatre_code,"theatre_location": city,"last_modified": cur_time,"film": bm_id}
+            putt = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+str(theatre_code)+'/'+date+'/'+bm_id+'/',json=payload, headers={'Content-type': 'application/json'})
             print("Status Code:",putt.status_code)
         except:
             print("Error Adding")
@@ -180,6 +181,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
         for count,show in enumerate(show_dict,start=1):
             print(show)
             print(show['show_id'])
+            bm_date = show['show_date']
             screen_name =''
             category_name = ''
             try:
@@ -210,7 +212,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
                 available_seat+= avail_seat + offset_in
                 show_date=urll['ShowDateCode']
                 booked_seat += tot_seat-(avail_seat+offset_in)
-                price = price + (float(urll['Price']) * (int(urll['TotalSeats'])-int(urll['AvailableSeats'])))
+                price = price + (float(urll['Price']) * (tot_seat-(avail_seat+offset_in)))
                 category_name= category_name+urll['CategoryName']+":"
                 print(category_name)
                 screen_name = screen_name+urll['ScreenName']+ ":"
@@ -218,8 +220,8 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
                 d1 = Current_date.strftime('%Y%m%d')
         cur_time=datetime_NY.strftime('%d/%m/%Y %I:%M %p')
         try:
-            payload2 = {"show_date":show_date,"show_count":count,"film":film_ID,"theatre_code":venue,"theatre_location":fm_loc,"theatre_name":theatre_name,"category_name": category_name.rstrip(':'),"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"last_modified": cur_time}
-            putData = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+venue+'/'+show_date+'/'+film_ID+'/',json=payload2, headers={'Content-type': 'application/json'})
+            payload2 = {"show_date":bm_date,"show_count":count,"film":film_ID,"theatre_code":venue,"theatre_location":fm_loc,"theatre_name":theatre_name,"category_name": category_name.rstrip(':'),"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"last_modified": cur_time}
+            putData = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+venue+'/'+bm_date+'/'+film_ID+'/',json=payload2, headers={'Content-type': 'application/json'})
             print(putData.status_code)
         except:
             print("Error adding")

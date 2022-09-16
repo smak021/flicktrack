@@ -1,7 +1,9 @@
+from ftplib import FTP_PORT
 from os import sep
 from telnetlib import TN3270E
 from time import strptime
 from unicodedata import category
+from xml.sax.handler import feature_validation
 import requests
 import json
 import re
@@ -13,9 +15,24 @@ from difflib import SequenceMatcher
 import cloudscraper
 
 
-flag = 1
-if(flag):
-    print("hello")
+total = 212
+offset = 27
+avail = 184
+bal = 0
+ft_st = 'FTADJST'
+ft_value = 212
+
+if(ft_st == 'FTADJST'):
+    bal = ft_value
+
+
+if(avail+bal+offset <= total):
+    offset += bal
+avail_seat = avail + offset
+booked = total -avail_seat
+print(offset)
+print(booked)
+print(avail_seat)
 
 # offset = 'SCREEN 1:[Classi:10],SCREEN 2:[Executive:2,Classic:1],SCREEN 3:[Execut:6,Classi:7]'
 # # offset = 'SCREEN 1:[16]'
