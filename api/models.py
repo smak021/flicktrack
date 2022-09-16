@@ -62,7 +62,7 @@ class track(models.Model):
     theatre_code = models.CharField(max_length=30,default="null")
     source = models.CharField(max_length=30,default="bms")
     offset = models.CharField(max_length=40,default='na')
-    offset_check = models.CharField(max_length=500,default='na')
+    offset_check = models.CharField(max_length=2000,default='na')
 
     def __str__(self):
         return self.track_id

@@ -64,17 +64,16 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
             category_name = section['label']
             total_seat = section['sTotal']
             total_seats += total_seat
+            offset_in = 0
             if(offset!='na'):
-                ind_offset = offset.rsplit(',')
+                ind_offset = offset.rsplit('],')
                 for roffset in ind_offset:
-                    offset_splt = roffset.rsplit(':')
+                    offset_splt = roffset.rsplit(':[')
                     if(offset_splt[0]==screen_name):
-                        offset_in = int(offset_splt[1])
-                        break
-                    else:
-                        offset_in = 0
-            else:
-                offset_in = 0
+                        for item2 in offset_splt[1].replace(']',"").rsplit(','):
+                            fin_split = item2.rsplit(':')
+                            if(fin_split[0]==category_name):
+                                offset_in = int(fin_split[1])
             print("Offset:", offset_in)
             available_seat = (section['sAvail'])
             if(total_seat-available_seat < offset_in):
@@ -184,17 +183,18 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
                 tot_seat = int(urll['TotalSeats'])
                 avail_seat = int(urll['AvailableSeats'])
                 total_seat+=int(urll['TotalSeats'])
+                offset_in = 0
                 if(offset!='na'):
-                    ind_offset = offset.rsplit(',')
+                    ind_offset = offset.rsplit('],')
                     for roffset in ind_offset:
-                        offset_splt = roffset.rsplit(':')
+                        offset_splt = roffset.rsplit(':[')
                         if(offset_splt[0]==urll['ScreenName']):
-                            offset_in = int(offset_splt[1])
-                            break
-                        else:
-                            offset_in = 0
-                else:
-                    offset_in = 0
+                            for item2 in offset_splt[1].replace(']',"").rsplit(','):
+                                fin_split = item2.rsplit(':')
+                                if(fin_split[0]==urll['CategoryName']):
+                                    offset_in = int(fin_split[1])
+        
+                print("Offset:",offset_in)
                 if(tot_seat-avail_seat < offset_in):
                     offset_in = 0
                 available_seat+= avail_seat + offset_in

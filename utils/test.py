@@ -1,6 +1,7 @@
 from os import sep
 from telnetlib import TN3270E
 from time import strptime
+from unicodedata import category
 import requests
 import json
 import re
@@ -12,6 +13,31 @@ from difflib import SequenceMatcher
 import cloudscraper
 
 
+offset = 'SCREEN 1:[Classi:10],SCREEN 2:[Executive:2,Classic:1],SCREEN 3:[Execut:6,Classi:7]'
+# offset = 'SCREEN 1:[16]'
+urll ={}
+urll['ScreenName']='SCREEN 1'
+urll['CategoryName']='Classi'
+# bm
+scr_nm = urll['ScreenName']
+sctn_nm = urll['CategoryName']
+# ptm
+
+
+
+offset_in = 0
+if(offset!='na'):
+    ind_offset = offset.rsplit('],')
+    for roffset in ind_offset:
+        offset_splt = roffset.rsplit(':[')
+        if(offset_splt[0]==scr_nm):
+            for item2 in offset_splt[1].replace(']',"").rsplit(','):
+                fin_split = item2.rsplit(':')
+                if(fin_split[0]==sctn_nm):
+                    print(fin_split[1])
+                    offset_in = int(fin_split[1])
+print(offset_in)
+                # dic.append({'Class':fin_split[0],'offset':fin_split[1],'screen':split2[0]})
 # BMS Efficient
 
 # scrapper = cloudscraper.create_scraper()
