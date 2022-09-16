@@ -64,6 +64,7 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
             category_name = section['label']
             flag=1
             offset_in = 0
+            balancing = 0
             if(offset!='na'):
                 ind_offset = offset.rsplit('],')
                 for roffset in ind_offset:
@@ -73,8 +74,11 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
                             fin_split = item2.rsplit(':')
                             if(fin_split[0]==category_name):
                                 offset_in = int(fin_split[1])
-                            elif(fin_split[0]=='FTEXIT'):
-                                flag=0
+                                flag=1
+                            # elif(fin_split[0]=='FTEXIT'):
+                            #     flag=0
+                            if(fin_split[0]=='FTADJST'):
+                                balancing = int(fin_split[1])
             if(flag):
                 print("Offset:", offset_in)
                 total_seat = section['sTotal']
@@ -82,6 +86,8 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
                 available_seat = (section['sAvail'])
                 if(total_seat-available_seat < offset_in):
                     offset_in = 0
+                if(available_seat + balancing + offset <= total_seat):
+                    offset_in += balancing
                 available_seats += (available_seat + offset_in)
                 booked_seat = total_seat-(available_seat + offset_in)
                 price = price + (section['price'] * booked_seat)
