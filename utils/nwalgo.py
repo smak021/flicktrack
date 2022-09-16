@@ -62,8 +62,7 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
         price = 0
         for section in row['areas']:
             category_name = section['label']
-            total_seat = section['sTotal']
-            total_seats += total_seat
+            flag=1
             offset_in = 0
             if(offset!='na'):
                 ind_offset = offset.rsplit('],')
@@ -74,19 +73,24 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
                             fin_split = item2.rsplit(':')
                             if(fin_split[0]==category_name):
                                 offset_in = int(fin_split[1])
-            print("Offset:", offset_in)
-            available_seat = (section['sAvail'])
-            if(total_seat-available_seat < offset_in):
-                offset_in = 0
-            available_seats += (available_seat + offset_in)
-            booked_seat = total_seat-(available_seat + offset_in)
-            price = price + (section['price'] * booked_seat)
-            print("Category Name:", category_name)
-            print("Total:",total_seat)
-            print("Available: ",available_seat + offset_in)
-            print("Booked:",booked_seat)
-            print("Price",price)
-            cur_time=datetime_NY.strftime('%d/%m/%Y %I:%M %p')  
+                            elif(fin_split[0]=='FTEXIT'):
+                                flag=0
+            if(flag):
+                print("Offset:", offset_in)
+                total_seat = section['sTotal']
+                total_seats += total_seat
+                available_seat = (section['sAvail'])
+                if(total_seat-available_seat < offset_in):
+                    offset_in = 0
+                available_seats += (available_seat + offset_in)
+                booked_seat = total_seat-(available_seat + offset_in)
+                price = price + (section['price'] * booked_seat)
+                print("Category Name:", category_name)
+                print("Total:",total_seat)
+                print("Available: ",available_seat + offset_in)
+                print("Booked:",booked_seat)
+                print("Price",price)
+        cur_time=datetime_NY.strftime('%d/%m/%Y %I:%M %p')  
         print(row['sid'],'----')
         payload = {"show_id": showcode,"show_time": 'NA',"show_date": ptm_date,"screen_name": str(available_seats)+":"+str(total_seats)+":"+str(price),"theatre_code": ptm_theatre_id,"last_modified": cur_time,"film": bm_id}
         putShow = requests.put('http://flicktracks.herokuapp.com/api/putshow/'+showcode+'/',json=payload, headers={'Content-type': 'application/json'})

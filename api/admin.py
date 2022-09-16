@@ -46,6 +46,25 @@ class films(admin.ModelAdmin):
             updated,
         )% updated, messages.SUCCESS)
 
+    @admin.action(description='Change priority to high')
+    def change_priority(self,request,queryset):
+        updated = queryset.update(priority=1)
+        self.message_user(request,ngettext(
+            '(%d) Priority was successfully changed.',
+            '(%d) Priorities were successfully changed.',
+            updated,
+        )% updated, messages.SUCCESS)
+
+    @admin.action(description='Change priority to low')
+    def change_priority(self,request,queryset):
+        updated = queryset.update(priority=0)
+        self.message_user(request,ngettext(
+            '(%d) Priority was successfully changed.',
+            '(%d) Priorities were successfully changed.',
+            updated,
+        )% updated, messages.SUCCESS)
+
+
        
 @admin.register(track)
 class track(admin.ModelAdmin):

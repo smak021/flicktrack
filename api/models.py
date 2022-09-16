@@ -24,6 +24,7 @@ class film(models.Model):
     cast_n_crew = models.CharField(max_length=1000)
     tn_code = models.CharField(max_length=50,default="NA")
     ptm_code = models.CharField(max_length=50, default="NA")
+    priority =models.IntegerField(default=0)
    
 
     def __str__(self):
