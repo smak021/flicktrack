@@ -218,6 +218,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
                 Current_date = date.today()
                 d1 = Current_date.strftime('%Y%m%d')
         cur_time=datetime_NY.strftime('%d/%m/%Y %I:%M %p')
+        print(cur_time)
         try:
             payload2 = {"show_date":bm_show_date,"show_count":count,"film":film_ID,"theatre_code":venue,"theatre_location":fm_loc,"theatre_name":theatre_name,"category_name": category_name.rstrip(':'),"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"last_modified": cur_time}
             putData = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+venue+'/'+bm_show_date+'/'+film_ID+'/',json=payload2, headers={'Content-type': 'application/json'})
