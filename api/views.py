@@ -311,7 +311,7 @@ class EndPoint(views.APIView):
                 # indv.append({'show_date':item2['show_date'],'show_count':item2['show_count'],'total':item2['total_seats'],'avail':item2['available_seats'],'booked':item2['booked_seats'],'price':item2['price']})
 
             # print(dsf)
-            nwdata = {'shows': show_count, 'category_name': dsf[0]['category_name'], 'price': math.floor(price), 'booked_seats': booked, 'available_seats': avail, 'total_seats': total, 'date': item, 'last_modified': dsf[0]['last_modified'], 'film': dsf[0]['film']}
+            nwdata = {'shows': show_count, 'category_name': dsf[0]['category_name'], 'total_amount': math.floor(price), 'booked_seats': booked, 'available_seats': avail, 'total_seats': total, 'date': item, 'last_modified': dsf[0]['last_modified'], 'film': dsf[0]['film']}
             arr.append(nwdata)
         #     data[row] = {"name": filmname,'date':row,'shows':show_count,"booked_seats":booked,"total_seats":total,'total_amount':amount}
 
