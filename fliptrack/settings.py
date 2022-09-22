@@ -70,6 +70,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
      "http://localhost:4200",
   "https://flicktracks.web.app",
+  "https://flicktracks.herokuapp.com",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -102,27 +103,27 @@ WSGI_APPLICATION = 'fliptrack.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 # Cloud
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.environ.get('DATABASE_NAME'),
-#         'USER': os.environ.get('DATABASE_USER'),
-#         'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-#         'HOST': os.environ.get('DATABASE_HOST'),
-#         'PORT': '5432'
-#     }
-# }
-
 DATABASES = {
-        'default': {
-            'ENGINE': 'djongo',
-            'NAME': os.environ.get('DATABASE_NAME'),
-            'ENFORCE_SCHEMA': False,
-            'CLIENT': {
-                'host': os.environ.get('DATABASE_HOST')
-            }  
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DATABASE_NAME'),
+        'USER': os.environ.get('DATABASE_USER'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
+        'HOST': os.environ.get('DATABASE_HOST'),
+        'PORT': '5432'
+    }
 }
+
+# DATABASES = {
+#         'default': {
+#             'ENGINE': 'djongo',
+#             'NAME': os.environ.get('DATABASE_NAME'),
+#             'ENFORCE_SCHEMA': False,
+#             'CLIENT': {
+#                 'host': os.environ.get('DATABASE_HOST')
+#             }  
+#         }
+# }
 
 # Test
 # DATABASES = {
@@ -135,8 +136,8 @@ DATABASES = {
 
 
 
-# db_from_env = dj_database_url.config(conn_max_age=600)
-# DATABASES['default'].update(db_from_env)
+db_from_env = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation
