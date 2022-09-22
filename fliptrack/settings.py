@@ -33,7 +33,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'n')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG =False
 
-ALLOWED_HOSTS = ['https://flicktracks.herokuapp.com','http://127.0.0.1']
+ALLOWED_HOSTS = ['https://flicktracks.herokuapp.com','127.0.0.1']
 
 
 # Application definition
@@ -69,7 +69,7 @@ MIDDLEWARE = [
 # )
 CORS_ALLOWED_ORIGINS = [
      "http://localhost:4200",
-  "https://flicktracks.web.app/",
+  "https://flicktracks.web.app",
   "https://flicktracks.herokuapp.com",
 ]
 
@@ -113,6 +113,7 @@ DATABASES = {
         'PORT': '5432'
     }
 }
+
 
 # DATABASES = {
 #         'default': {
