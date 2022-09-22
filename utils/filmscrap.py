@@ -13,7 +13,6 @@ def bms_calc():
         # loc = fmlo['track_location']
         loc = fmlo
         scrapper = cloudscraper.create_scraper()
-
         payload='{"bmsId":"1.2572928712.1661954374374","regionCode":"'+loc+'","isSuperstar":"N"}'
         print(payload)
         requests.adapters.DEFAULT_RETRIES = 5
@@ -21,70 +20,72 @@ def bms_calc():
             url = scrapper.post('https://in.bookmyshow.com/pwa/api/uapi/movies',data=payload,headers={'content-type':'application/json'}) 
             # print(url.text)
             url_json = json.loads(url.text)
-            substring = 'email protected'
-            if url_json:
-                for i in url_json["nowShowing"]["arrEvents"]:
-                    film_name = str(i["ChildEvents"][0]['EventURL'])
-                    film_real_name=str(i["ChildEvents"][0]['EventName'])
-                    print(film_name)
-                    film_id = str(i["ChildEvents"][0]['EventCode'])
-                    release_date = str(i["ChildEvents"][0]['EventDate'])
-                    image_url = str(i["ChildEvents"][0]['EventImageCode'])
-                    film_length=str(i["ChildEvents"][0]['Duration'])
-                    film_genre=str(i["ChildEvents"][0]['EventGenre'])
-                    film_censor=str(i["ChildEvents"][0]['EventCensor'])
-                    film_loc = str(i["ChildEvents"][0]['RegCode'])
-                    # Scrapping film story from site
-                    storyurl = scrapper.get("https://in.bookmyshow.com/"+loc+"/movies/"+film_name+"/"+film_id)
-                    html = BeautifulSoup(storyurl.content,"html.parser")
-                    query = html.find("section",id="component-1")
-
-                    film_story = query.span.span.text
-                    #end of scrap
-                    #scrap cast n crew
-                    actors=[]
-                    crew=[]
-                    ccquery = html.find("section",id="component-4")
-                    try:
-                        classname =  ccquery.a['class'][0]
-                        readquery = html.find_all("a",class_=classname)
-                    except AttributeError:
-                        readquery = None
-                    # acount =0
-                    # ccount =0
-                    if readquery != None:
-                        for val in readquery:
-                            if val.h5.parent.parent.parent.parent.parent['id'] == 'component-4':
-                                if val.h5.string != None:
-                                    actors.append(val.h5.string)
-                                else:
-                                    actors.append('NA')
-                            else:
-                                if val.h5.string != None:
-                                    crew.append(val.h5.string)
-                                else:
-                                    actors.append('NA')
-                    else:
-                        actors=["NA","NA"]
-                        crew = ["NA"]
-                    actors.append("NA")
-                    crew.append("NA")
-                    castncrew = {'actors':actors,'crews':crew}
-                    jsoncastncrew = json.dumps(castncrew)
-                    # end cast n crew scrap
-                    if (film_story!= None and substring in film_story) or film_story == None:
-                        film_story='Not Available'
-                    print(film_loc)
-                    payload1={"film_id":film_id,"film_name": film_name, "cover_url":image_url, "release_date": release_date,"film_story":film_story,"film_genre":film_genre,"film_censor":film_censor,"film_duration":film_length,"full_name":film_real_name,"cast_n_crew":jsoncastncrew}
-                    payload2 = {"film_id":film_id,"is_tracking":True}
-                    payload1_json = json.dumps(payload1)
-                    url1=requests.put('http://flicktracks.herokuapp.com/api/putfilm/'+film_id+'/', json=payload1, headers={'Content-type': 'application/json'})
-                    # url2 = requests.put('http://flicktracks.herokuapp.com/api/status/',json=payload2,headers={'Content-type': 'application/json'})
-                    print(url1.status_code)
-                    
-                    #print(url1.text)
         except:
-            print("Error")
+            print("Error reading url")
+            url_json = False
+        substring = 'email protected'
+        if url_json:
+            for i in url_json["nowShowing"]["arrEvents"]:
+                film_name = str(i["ChildEvents"][0]['EventURL'])
+                film_real_name=str(i["ChildEvents"][0]['EventName'])
+                print(film_name)
+                film_id = str(i["ChildEvents"][0]['EventCode'])
+                release_date = str(i["ChildEvents"][0]['EventDate'])
+                image_url = str(i["ChildEvents"][0]['EventImageCode'])
+                film_length=str(i["ChildEvents"][0]['Duration'])
+                film_genre=str(i["ChildEvents"][0]['EventGenre'])
+                film_censor=str(i["ChildEvents"][0]['EventCensor'])
+                film_loc = str(i["ChildEvents"][0]['RegCode'])
+                # Scrapping film story from site
+                storyurl = scrapper.get("https://in.bookmyshow.com/"+loc+"/movies/"+film_name+"/"+film_id)
+                html = BeautifulSoup(storyurl.content,"html.parser")
+                query = html.find("section",id="component-1")
+
+                film_story = query.span.span.text
+                #end of scrap
+                #scrap cast n crew
+                actors=[]
+                crew=[]
+                ccquery = html.find("section",id="component-4")
+                try:
+                    classname =  ccquery.a['class'][0]
+                    readquery = html.find_all("a",class_=classname)
+                except AttributeError:
+                    readquery = None
+                # acount =0
+                # ccount =0
+                if readquery != None:
+                    for val in readquery:
+                        if val.h5.parent.parent.parent.parent.parent['id'] == 'component-4':
+                            if val.h5.string != None:
+                                actors.append(val.h5.string)
+                            else:
+                                actors.append('NA')
+                        else:
+                            if val.h5.string != None:
+                                crew.append(val.h5.string)
+                            else:
+                                actors.append('NA')
+                else:
+                    actors=["NA","NA"]
+                    crew = ["NA"]
+                actors.append("NA")
+                crew.append("NA")
+                castncrew = {'actors':actors,'crews':crew}
+                jsoncastncrew = json.dumps(castncrew)
+                # end cast n crew scrap
+                if (film_story!= None and substring in film_story) or film_story == None:
+                    film_story='Not Available'
+                print(film_loc)
+                payload1={"film_id":film_id,"film_name": film_name, "cover_url":image_url, "release_date": release_date,"film_story":film_story,"film_genre":film_genre,"film_censor":film_censor,"film_duration":film_length,"full_name":film_real_name,"cast_n_crew":jsoncastncrew}
+                payload2 = {"film_id":film_id,"is_tracking":True}
+                payload1_json = json.dumps(payload1)
+                url1=requests.put('http://flicktracks.herokuapp.com/api/putfilm/'+film_id+'/', json=payload1, headers={'Content-type': 'application/json'})
+                # url2 = requests.put('http://flicktracks.herokuapp.com/api/status/',json=payload2,headers={'Content-type': 'application/json'})
+                print(url1.status_code)
+                
+                #print(url1.text)
+       
 
 # TktNw Function
 
@@ -123,39 +124,41 @@ def tn_calc():
             print("---------------------------")
 
 def ptm_calc():     
-    city = 'kochi'
-    website = 'https://paytm.com/movies/'+city
-    page = requests.get(website,cookies={'movies_city': city})
-    soup = BeautifulSoup(page.content, "html.parser")
-    ssid= soup.find('script',id='__NEXT_DATA__')
-    data = ssid.text
-    jsonData =  json.loads(data)
-    for data in jsonData['props']['pageProps']['initialState']['movies']['currentlyRunningMovies'][city]['groupedMovies']:
-        print("Film Name:",data['label'])
-        film_name = data['label']
-        ptm_code = data['languageFormatGroups'][0]['fmtGrpId']
-        print("Paytm Code:",data['languageFormatGroups'][0]['fmtGrpId'])
-        code = data['languageFormatGroups'][0]['fmtGrpId']
-        film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
-        film_data_json = json.loads(film_data)
-        for film in film_data_json:
-            bms_id = film['film_id']
-            bms_name = film['full_name']
-            test = bms_name.rsplit('(')
-            bms_name = test[0]
-            print("BMS NAme:",bms_name)
-            print("Paytm Film Name:",data['label'])
-            check_match = SequenceMatcher(None,film_name.lower(),bms_name.lower()).ratio()
-            # print(check_match)
-            if check_match>0.8:
-                print("Passed")
-                print(bms_id)
-                payload = {"ptm_code":ptm_code}
-                putData =requests.put('http://flicktracks.herokuapp.com/api/upfilm/'+bms_id, json=payload, headers={'Content-type': 'application/json'})
-                print(putData.status_code)
-                break
-            print("-----------------")
+    locations = ['kochi','kozhikode']
+    for city in locations:
+        print(city)
+        website = 'https://paytm.com/movies/'+city
+        page = requests.get(website,cookies={'movies_city': city})
+        soup = BeautifulSoup(page.content, "html.parser")
+        ssid= soup.find('script',id='__NEXT_DATA__')
+        data = ssid.text
+        jsonData =  json.loads(data)
+        for data in jsonData['props']['pageProps']['initialState']['movies']['currentlyRunningMovies'][city]['groupedMovies']:
+            print("Film Name:",data['label'])
+            film_name = data['label'].rsplit('(')[0]
+            ptm_code = data['languageFormatGroups'][0]['fmtGrpId']
+            print("Paytm Code:",data['languageFormatGroups'][0]['fmtGrpId'])
+            code = data['languageFormatGroups'][0]['fmtGrpId']
+            film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
+            film_data_json = json.loads(film_data)
+            for film in film_data_json:
+                bms_id = film['film_id']
+                bms_name = film['full_name']
+                test = bms_name.rsplit('(')
+                bms_name = test[0]
+                print("BMS NAme:",bms_name)
+                print("Paytm Film Name:",data['label'])
+                check_match = SequenceMatcher(None,film_name.lower(),bms_name.lower()).ratio()
+                # print(check_match)
+                if check_match>0.8:
+                    print("Passed")
+                    print(bms_id)
+                    payload = {"ptm_code":ptm_code}
+                    putData =requests.put('http://flicktracks.herokuapp.com/api/upfilm/'+bms_id, json=payload, headers={'Content-type': 'application/json'})
+                    print(putData.status_code)
+                    break
+                print("-----------------")
 
 bms_calc()
-tn_calc()
+# tn_calc()
 ptm_calc()
