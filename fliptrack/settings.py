@@ -33,7 +33,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'n')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG =False
 
-ALLOWED_HOSTS = ['flicktracks.herokuapp.com','127.0.0.1']
+ALLOWED_HOSTS = ['*']
+# 'flicktracks.herokuapp.com','127.0.0.1']
 
 
 # Application definition
@@ -61,22 +62,22 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 
 # CORS_ORIGIN_WHITELIST = (
 #   'http://localhost:8000',
 #   'http://flicktracks.web.app'
 # )
 CORS_ALLOWED_ORIGINS = [
-    '*'
+    '*']
 #      "http://localhost:4200",
 #   "https://flicktracks.web.app",
-]
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:4200",
-    "https://flicktracks.web.app",
-]
+
+# CSRF_TRUSTED_ORIGINS = [
+#     "http://localhost:4200",
+#     "https://flicktracks.web.app",
+# ]
 
 ROOT_URLCONF = 'fliptrack.urls'
 
