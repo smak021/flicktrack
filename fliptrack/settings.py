@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'n')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG =True
+DEBUG =False
 
 ALLOWED_HOSTS = ['flicktracks.herokuapp.com','127.0.0.1']
 
@@ -61,16 +61,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-# CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = False
 
 # CORS_ORIGIN_WHITELIST = (
 #   'http://localhost:8000',
 #   'http://flicktracks.web.app'
 # )
 CORS_ALLOWED_ORIGINS = [
-     "http://localhost:4200",
-  "https://flicktracks.web.app",
-  "https://flicktracks.herokuapp.com",
+    '*'
+#      "http://localhost:4200",
+#   "https://flicktracks.web.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
