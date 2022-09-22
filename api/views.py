@@ -288,18 +288,45 @@ def getbytheatre(request,filmid):
 
 class EndPoint(views.APIView):
     def get(self, request,filmid):
-        data={}
-        filmname = film.objects.filter(film_id=filmid).first().full_name
-        print(filmname)
-        for row in mdata.objects.filter(film_id=filmid).order_by('-show_date').values_list('show_date',flat=True).distinct():
-            print(row)
-            query = mdata.objects.filter(film_id=filmid, show_date=row)
-            booked = query.annotate(booked_seat=Cast('booked_seats', IntegerField())).aggregate(Sum('booked_seat'))["booked_seat__sum"]
-            amount = query.annotate(booked_seat=Cast('booked_seats', IntegerField()),amount = Cast('price',FloatField())).aggregate(total=Sum('amount',output_field=IntegerField()))["total"]
-            total = query.annotate(t_seat=Cast('total_seats', IntegerField())).aggregate(Sum('t_seat'))["t_seat__sum"]
-            show_count = query.annotate(s_count=Cast('show_count', IntegerField())).aggregate(Sum('show_count'))["show_count__sum"]
-            data[row] = {"name": filmname,'date':row,'shows':show_count,"booked_seats":booked,"total_seats":total,'total_amount':amount}
-        return Response(data)
+
+        arr=[]
+        url =requests.get('https://flicktracks.herokuapp.com/api/getData/'+filmid+'/?format=json')
+        data = json.loads(url.text)
+        uni = sorted(set(dic['show_date'] for dic in data))
+        for item in uni:
+            # print(item)
+            dsf = [val for val in data if val['show_date'] == item]
+            total=0
+            booked=0
+            avail=0
+            price=0
+            indv = []
+            show_count=0
+            for item2 in dsf:
+                total += int(item2['total_seats'])
+                avail += int(item2['available_seats']) 
+                booked += int(item2['booked_seats'])
+                price += float(item2['price'])
+                show_count += int(item2['show_count'])
+                # indv.append({'show_date':item2['show_date'],'show_count':item2['show_count'],'total':item2['total_seats'],'avail':item2['available_seats'],'booked':item2['booked_seats'],'price':item2['price']})
+
+            # print(dsf)
+            nwdata = {'show_count': show_count, 'category_name': dsf[0]['category_name'], 'price': math.floor(price), 'booked_seats': booked, 'available_seats': avail, 'total_seats': total, 'theatre_code': item, 'theatre_location': dsf[0]['theatre_location'], 'theatre_name': dsf[0]['theatre_name'], 'last_modified': dsf[0]['last_modified'], 'film': dsf[0]['film']}
+            arr.append(nwdata)
+
+
+        # data={}
+        # filmname = film.objects.filter(film_id=filmid).first().full_name
+        # print(filmname)
+        # for row in mdata.objects.filter(film_id=filmid).order_by('-show_date').values_list('show_date',flat=True).distinct():
+        #     print(row)
+        #     query = mdata.objects.filter(film_id=filmid, show_date=row)
+        #     booked = query.annotate(booked_seat=Cast('booked_seats', IntegerField())).aggregate(Sum('booked_seat'))["booked_seat__sum"]
+        #     amount = query.annotate(booked_seat=Cast('booked_seats', IntegerField()),amount = Cast('price',FloatField())).aggregate(total=Sum('amount',output_field=IntegerField()))["total"]
+        #     total = query.annotate(t_seat=Cast('total_seats', IntegerField())).aggregate(Sum('t_seat'))["t_seat__sum"]
+        #     show_count = query.annotate(s_count=Cast('show_count', IntegerField())).aggregate(Sum('show_count'))["show_count__sum"]
+        #     data[row] = {"name": filmname,'date':row,'shows':show_count,"booked_seats":booked,"total_seats":total,'total_amount':amount}
+        return Response(arr)
 
 
 @csrf_exempt
