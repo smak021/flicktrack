@@ -31,7 +31,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'n')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG =False
+if(os.environ.get('DEBUG'=='False')):
+    DEBUG =False
+elif(os.environ.get('DEBUG'=='True')):
+    DEBUG =True
+else:
+    DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 # 'flicktracks.herokuapp.com','127.0.0.1']

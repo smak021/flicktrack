@@ -1,5 +1,5 @@
 # Default ignored files
-/env
+env/
 /utils/filmscrap-local.py
 /utils/maintest2-local.py
 /utils/nwalgo-local.py
