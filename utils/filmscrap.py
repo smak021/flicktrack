@@ -37,21 +37,21 @@ def bms_calc():
                 film_censor=str(i["ChildEvents"][0]['EventCensor'])
                 film_loc = str(i["ChildEvents"][0]['RegCode'])
                 # Scrapping film story from site
-                storyurl = scrapper.get("https://in.bookmyshow.com/"+loc+"/movies/"+film_name+"/"+film_id)
-                html = BeautifulSoup(storyurl.content,"html.parser")
-                query = html.find("section",id="component-1")
-
-                film_story = query.span.span.text
-                #end of scrap
-                #scrap cast n crew
-                actors=[]
-                crew=[]
-                ccquery = html.find("section",id="component-4")
                 try:
+                    storyurl = scrapper.get("https://in.bookmyshow.com/"+loc+"/movies/"+film_name+"/"+film_id)
+                    html = BeautifulSoup(storyurl.content,"html.parser")
+                    query = html.find("section",id="component-1")
+                    film_story = query.span.span.text
+                    #end of scrap
+                    #scrap cast n crew
+                    actors=[]
+                    crew=[]
+                    ccquery = html.find("section",id="component-4")
                     classname =  ccquery.a['class'][0]
                     readquery = html.find_all("a",class_=classname)
-                except AttributeError:
-                    readquery = None
+                except:
+                    print('Error reading')
+                    readquery=None
                 # acount =0
                 # ccount =0
                 if readquery != None:
