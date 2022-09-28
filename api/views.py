@@ -326,7 +326,7 @@ class EndPoint(views.APIView):
                 booked += int(it.booked_seats)
                 price += float(it.price)
                 show_count += int(it.show_count)
-            theatredata = {'show_count': show_count, 'category_name':'it.category_name', 'price': math.floor(price), 'booked_seats': booked, 'available_seats': avail, 'total_seats': total, 'theatre_code': item, 'theatre_location': 'it.theatre_code', 'theatre_name': 'it.theatre_name', 'last_modified': 'it.last_modified', 'film': 'it.film.film_id','rows':'indv'}
+            theatredata = {'show_count': show_count, 'category_name':it.category_name, 'price': math.floor(price), 'booked_seats': booked, 'available_seats': avail, 'total_seats': total, 'theatre_code': item, 'theatre_location': it.theatre_code, 'theatre_name':it.theatre_name, 'last_modified': it.last_modified, 'film': it.film.film_id,'rows':indv}
             tarr.append(theatredata)
         
         data = {'theatre':tarr,'date':darr}
