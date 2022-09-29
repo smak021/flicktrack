@@ -31,7 +31,7 @@ def pytest(request,filmid):
         data2=[]
         client = pymongo.MongoClient(os.environ.get('DATABASE_HOST'))
         #Define Db Name
-        dbname = os.environ.get('DATABASE_NAME')
+        dbname = client[os.environ.get('DATABASE_NAME')]
         print("entered")
         #Define Collection
         collection = dbname['api_mdata']
