@@ -16,8 +16,8 @@ class mdata(admin.ModelAdmin):
 
 @admin.register(film)
 class films(admin.ModelAdmin):
-    list_display=['film_id','full_name','release_date','film_status','tn_code','ptm_code','priority']
-    actions= ['make_inactive','make_active','make_stop','change_priority_low','change_priority_high']
+    list_display=['film_id','full_name','release_date','film_status','tn_code','ptm_code','priority','language','highlight']
+    actions= ['make_inactive','make_active','make_stop','change_priority_low','change_priority_high','change_highlight_low','change_highlight_high']
 
     @admin.action(description='Mark film status as stopped')
     def make_stop(self,request,queryset):
@@ -61,6 +61,23 @@ class films(admin.ModelAdmin):
         self.message_user(request,ngettext(
             '(%d) Priority was successfully changed.',
             '(%d) Priorities were successfully changed.',
+            updated,
+        )% updated, messages.SUCCESS)
+    @admin.action(description='Change highlight to high')
+    def change_highlight_high(self,request,queryset):
+        updated = queryset.update(highlight=1)
+        self.message_user(request,ngettext(
+            '(%d) highlight was successfully changed.',
+            '(%d) highlights were successfully changed.',
+            updated,
+        )% updated, messages.SUCCESS)
+
+    @admin.action(description='Change highlight to low')
+    def change_highlight_low(self,request,queryset):
+        updated = queryset.update(highlight=0)
+        self.message_user(request,ngettext(
+            '(%d) highlight was successfully changed.',
+            '(%d) highlights were successfully changed.',
             updated,
         )% updated, messages.SUCCESS)
 

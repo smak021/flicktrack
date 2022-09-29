@@ -33,7 +33,7 @@ def home_pg(self):
 @csrf_exempt
 def films(request):
     if request.method == 'GET':
-        filmdata = film.objects.filter(~Q(film_status='inactive')).order_by('-priority','-release_date')
+        filmdata = film.objects.filter(~Q(film_status='inactive')).order_by('-highlight','-release_date','-priority')
         serializer = filmserializer(filmdata, many=True)
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'PUT':

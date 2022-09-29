@@ -36,6 +36,7 @@ def bms_calc():
                     image_url = str(film['EventImageCode'])
                     film_length=str(film['Duration'])
                     film_genre=str(film['EventGenre'])
+                    language = str(film['EventLanguage'])
                     film_censor=str(film['EventCensor'])
                     film_loc = str(film['RegCode'])
                     # Scrapping film story from site
@@ -72,6 +73,7 @@ def bms_calc():
                     else:
                         actors=["NA","NA"]
                         crew = ["NA"]
+                    if film_story is None:
                         film_story='Not Available'
                     actors.append("NA")
                     crew.append("NA")
@@ -81,7 +83,7 @@ def bms_calc():
                     if  (film_story == None) or (film_story!= None and substring in film_story):
                         film_story='Not Available'
                     print(film_loc)
-                    payload1={"film_id":film_id,"film_name": film_name, "cover_url":image_url,"language":'NA', "release_date": release_date,"film_story":film_story,"film_genre":film_genre,"film_censor":film_censor,"film_duration":film_length,"full_name":film_real_name,"cast_n_crew":jsoncastncrew}
+                    payload1={"film_id":film_id,"film_name": film_name, "cover_url":image_url,"language":language, "release_date": release_date,"film_story":film_story,"film_genre":film_genre,"film_censor":film_censor,"film_duration":film_length,"full_name":film_real_name,"cast_n_crew":jsoncastncrew}
                     payload2 = {"film_id":film_id,"is_tracking":True}
                     payload1_json = json.dumps(payload1)
                     url1=requests.put('http://flicktracks.herokuapp.com/api/putfilm/'+film_id+'/', json=payload1, headers={'Content-type': 'application/json'})
@@ -141,21 +143,23 @@ def ptm_calc():
             print("Film Name:",data['label'])
             film_name = data['label'].rsplit('(')[0]
             for language in data['languageFormatGroups']:
-                ptm_code = data['fmtGrpId']
-                nw_film_name = film_name+" ("+language['lang']+")"
-                print("Paytm Code:",data['fmtGrpId'])
+                film_language = language['lang']
+                ptm_code = language['fmtGrpId']
+                print("Paytm Code:",language['fmtGrpId'])
                 film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
                 film_data_json = json.loads(film_data)
                 for film in film_data_json:
                     bms_id = film['film_id']
                     bms_name = film['full_name']
+                    bms_lang = film['language']
                     test = bms_name.rsplit('(')
                     bms_name = test[0]
                     print("BMS NAme:",bms_name)
                     print("Paytm Film Name:",data['label'])
                     check_match = SequenceMatcher(None,film_name.lower(),bms_name.lower()).ratio()
+                    language_match = SequenceMatcher(None,bms_lang.lower(),film_language.lower()).ratio()
                     # print(check_match)
-                    if check_match>0.8:
+                    if check_match>0.8 and (language_match>0.8):
                         print("Passed")
                         print(bms_id)
                         payload = {"ptm_code":ptm_code}
@@ -164,6 +168,6 @@ def ptm_calc():
                         break
                     print("-----------------")
 
-bms_calc()
+# bms_calc()
 # tn_calc()
-# ptm_calc()
+ptm_calc()
