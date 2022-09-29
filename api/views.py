@@ -308,6 +308,7 @@ class EndPoint(views.APIView):
                 booked += int(it.booked_seats)
                 price += float(it.price)
                 show_count += int(it.show_count)
+                location = track.objects.filter(theatre_code=it.theatre_code).first().loc_real_name
                 if it.theatre_code in theatre_test:
                     theatre_test[it.theatre_code]['total_seats']=theatre_test[it.theatre_code]['total_seats']+int(it.total_seats)
                     theatre_test[it.theatre_code]['show_count']=theatre_test[it.theatre_code]['show_count']+int(it.show_count)
@@ -316,10 +317,10 @@ class EndPoint(views.APIView):
                     theatre_test[it.theatre_code]['price']=theatre_test[it.theatre_code]['price']+math.floor(float(it.price))
                     theatre_test[it.theatre_code]['last_modified']=it.last_modified
                 else:
-                    theatre_test[it.theatre_code]={'show_count':int(it.show_count),'category_name':it.category_name,'total_seats':int(it.total_seats),'booked_seats':int(it.booked_seats),'available_seats': int(it.available_seats) ,'price': math.floor(float(it.price)),'theatre_code': it.theatre_code, 'theatre_location': it.theatre_code, 'theatre_name':it.theatre_name, 'last_modified': it.last_modified, 'film': it.film.film_id}
-            nwdata = {'shows': show_count, 'category_name': it.category_name, 'total_amount': math.floor(price), 'booked_seats': booked, 'available_seats': avail, 'total_seats': total, 'date': item, 'last_modified': it.last_modified, 'film': it.film.film_id}
+                    theatre_test[it.theatre_code]={'show_count':int(it.show_count),'total_seats':int(it.total_seats),'booked_seats':int(it.booked_seats),'available_seats': int(it.available_seats) ,'price': math.floor(float(it.price)),'theatre_code': it.theatre_code, 'theatre_location': location, 'theatre_name':it.theatre_name}
+            nwdata = {'shows': show_count,'total_amount': math.floor(price), 'booked_seats': booked, 'available_seats': avail, 'total_seats': total, 'date': item, 'last_modified': it.last_modified}
             darr.append(nwdata)
-        data = {'theatre':theatre_test.values(),'date':darr}
+        data = {'film':filmid,'theatre':theatre_test.values(),'date':darr}
         return Response(data)
 
 
