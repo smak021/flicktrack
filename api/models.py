@@ -1,4 +1,5 @@
 
+from email.policy import default
 from django.db import models
 # Create your models here.
 #New Simple Table
@@ -25,6 +26,9 @@ class film(models.Model):
     tn_code = models.CharField(max_length=50,default="NA")
     ptm_code = models.CharField(max_length=50, default="NA")
     priority =models.IntegerField(default=0)
+    highlight =models.IntegerField(default=0)
+    language = models.CharField(max_length = 50, default="na")
+    other_lang_code= models.CharField(max_length = 500, default="na")
    
 
     def __str__(self):
