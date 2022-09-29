@@ -84,8 +84,6 @@ def bms_calc():
                         film_story='Not Available'
                     print(film_loc)
                     payload1={"film_id":film_id,"film_name": film_name, "cover_url":image_url,"language":language, "release_date": release_date,"film_story":film_story,"film_genre":film_genre,"film_censor":film_censor,"film_duration":film_length,"full_name":film_real_name,"cast_n_crew":jsoncastncrew}
-                    payload2 = {"film_id":film_id,"is_tracking":True}
-                    payload1_json = json.dumps(payload1)
                     url1=requests.put('http://flicktracks.herokuapp.com/api/putfilm/'+film_id+'/', json=payload1, headers={'Content-type': 'application/json'})
                     # url2 = requests.put('http://flicktracks.herokuapp.com/api/status/',json=payload2,headers={'Content-type': 'application/json'})
                     print(url1.status_code)
@@ -168,6 +166,6 @@ def ptm_calc():
                         break
                     print("-----------------")
 
-# bms_calc()
+bms_calc()
 # tn_calc()
 ptm_calc()

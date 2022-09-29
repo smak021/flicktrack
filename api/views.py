@@ -1,7 +1,6 @@
 from cmath import log
 import math
 from datetime import datetime, timedelta
-import stat
 import pytz
 from urllib import response
 from django.db.models.functions import Cast
@@ -18,7 +17,55 @@ from rest_framework.generics import ListAPIView
 from django.views.decorators.csrf import csrf_exempt
 from .models import mdata, track, film,status,show
 from .serializers import filmfilterserializer,showserializer ,mdataserializer, filmserializer, trackserializer,dataserializer,statusserializer
+import pymongo
+from bson import json_util, ObjectId
+from bson.son import SON
+import os
+from pathlib import Path
+import dj_database_url
 
+@csrf_exempt
+def pytest(request,filmid):
+    if request.method == 'GET':
+        data=[]
+        data2=[]
+        client = pymongo.MongoClient(os.environ.get('DATABASE_HOST'))
+        #Define Db Name
+        dbname = os.environ.get('DATABASE_NAME')
+        print("entered")
+        #Define Collection
+        collection = dbname['api_mdata']
+        pipeline1 = [
+            {
+                "$match": {"film_id":filmid}
+                },
+            {
+                "$group":{"_id":"$theatre_code","name":{"$first":"$theatre_name"},"shows":{"$sum":{'$toInt':"$show_count"}},"booked":{"$sum":{'$toInt':"$booked_seats"}},"total":{"$sum":{'$toInt':"$total_seats"}},"amount":{"$sum":{'$toDouble':"$price"}}}
+                },
+                {
+                    "$sort":SON([("_id", 1)])
+                }
+        ]
+        pipeline2 = [
+            {
+                "$match": {"film_id":filmid}
+                },
+            {
+                "$group":{"_id":"$show_date","film": { "$first": "$film_id"},"booked":{"$sum":{'$toInt':"$booked_seats"}},"total":{"$sum":{'$toInt':"$total_seats"}},"amount":{"$sum":{'$toDouble':"$price"}}}
+                },
+                {
+                    "$sort":SON([("_id", 1)])
+                }
+        ]
+        
+        dateData = collection.aggregate(pipeline2)
+        theatreData = collection.aggregate(pipeline1)
+        data = list(dateData)
+        data2 = list(theatreData)
+        page1 = json.loads(json_util.dumps(data))
+        page2 = json.loads(json_util.dumps(data2))
+        final = {"date":page1,"theatre":page2}
+    return JsonResponse(final,safe=False)
 
 # Create your views here.
 
