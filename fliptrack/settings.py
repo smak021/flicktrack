@@ -73,8 +73,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 #   'http://localhost:8000',
 #   'http://flicktracks.web.app'
 # )
-CORS_ALLOWED_ORIGINS = [
-    '*']
+# CORS_ALLOWED_ORIGINS = ['*']
 #      "http://localhost:4200",
 #   "https://flicktracks.web.app",
 

@@ -290,46 +290,36 @@ def getbytheatre(request,filmid):
 
 class EndPoint(views.APIView):
     def get(self, request,filmid):
+        theatre_test={}
         darr=[]
         tarr=[]
         url = mdata.objects.filter(film_id = filmid)
         uni = url.order_by('show_date').values_list('show_date',flat=True).distinct()
-        for item in uni: 
+        for item in uni.iterator(): 
             query = url.filter(show_date=item)
             total=0
             booked=0
             avail=0
             price=0
-            indv = []
             show_count=0
-            for it in query:
+            for it in query.iterator():
                 total += int(it.total_seats)
                 avail += int(it.available_seats) 
                 booked += int(it.booked_seats)
                 price += float(it.price)
                 show_count += int(it.show_count)
+                if it.theatre_code in theatre_test:
+                    theatre_test[it.theatre_code]['total_seats']=theatre_test[it.theatre_code]['total_seats']+int(it.total_seats)
+                    theatre_test[it.theatre_code]['show_count']=theatre_test[it.theatre_code]['show_count']+int(it.show_count)
+                    theatre_test[it.theatre_code]['booked_seats']=theatre_test[it.theatre_code]['booked_seats']+int(it.booked_seats)
+                    theatre_test[it.theatre_code]['available_seats']=theatre_test[it.theatre_code]['available_seats']+int(it.available_seats)
+                    theatre_test[it.theatre_code]['price']=theatre_test[it.theatre_code]['price']+math.floor(float(it.price))
+                    theatre_test[it.theatre_code]['last_modified']=it.last_modified
+                else:
+                    theatre_test[it.theatre_code]={'show_count':int(it.show_count),'category_name':it.category_name,'total_seats':int(it.total_seats),'booked_seats':int(it.booked_seats),'available_seats': int(it.available_seats) ,'price': math.floor(float(it.price)),'theatre_code': it.theatre_code, 'theatre_location': it.theatre_code, 'theatre_name':it.theatre_name, 'last_modified': it.last_modified, 'film': it.film.film_id}
             nwdata = {'shows': show_count, 'category_name': it.category_name, 'total_amount': math.floor(price), 'booked_seats': booked, 'available_seats': avail, 'total_seats': total, 'date': item, 'last_modified': it.last_modified, 'film': it.film.film_id}
-            print(nwdata)
             darr.append(nwdata)
-        url2 = url.order_by('theatre_code').values_list('theatre_code',flat=True).distinct()
-        for item in url2:
-            query2= url.filter(theatre_code=item)
-            total=0
-            booked=0
-            avail=0
-            price=0
-            indv = []
-            show_count=0
-            for it in query2:
-                total += int(it.total_seats)
-                avail += int(it.available_seats) 
-                booked += int(it.booked_seats)
-                price += float(it.price)
-                show_count += int(it.show_count)
-            theatredata = {'show_count': show_count, 'category_name':it.category_name, 'price': math.floor(price), 'booked_seats': booked, 'available_seats': avail, 'total_seats': total, 'theatre_code': item, 'theatre_location': it.theatre_code, 'theatre_name':it.theatre_name, 'last_modified': it.last_modified, 'film': it.film.film_id,'rows':indv}
-            tarr.append(theatredata)
-        
-        data = {'theatre':tarr,'date':darr}
+        data = {'theatre':(theatre_test[i] for i in sorted(theatre_test)),'date':darr}
         return Response(data)
 
 
