@@ -189,6 +189,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
                 data = json.loads(url2)
             except:
                 print("Error loading JSON")
+                data={}
                 data['BookMyShow']['arrShowInfo']=[]
             for urll in data['BookMyShow']['arrShowInfo']:
                 tot_seat = int(urll['TotalSeats'])
