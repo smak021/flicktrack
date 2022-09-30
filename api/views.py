@@ -24,26 +24,56 @@ import os
 from pathlib import Path
 import dj_database_url
 
+def Mongoconnect():
+    client = pymongo.MongoClient(os.environ.get('DATABASE_HOST'))
+        #Define Db Name
+    dbname = client[os.environ.get('DATABASE_NAME')]
+    return dbname
+
+# PyMongo
+# GET
 @csrf_exempt
 def pytest(request,filmid):
     if request.method == 'GET':
         data=[]
         data2=[]
-        client = pymongo.MongoClient(os.environ.get('DATABASE_HOST'))
-        #Define Db Name
-        dbname = client[os.environ.get('DATABASE_NAME')]
-        print("entered")
+        
+        dbname = Mongoconnect()
+        
         #Define Collection
         collection = dbname['api_mdata']
         pipeline1 = [
             {
+        "$lookup":{
+            "from": "api_track",       
+            "localField": "theatre_code",  
+            "foreignField": "theatre_code", 
+            "as": "theatre_location"         
+        }
+    },
+    {   "$unwind":"$theatre_location" },
+            {
                 "$match": {"film_id":filmid}
                 },
+               
             {
-                "$group":{"_id":"$theatre_code","name":{"$first":"$theatre_name"},"shows":{"$sum":{'$toInt':"$show_count"}},"booked":{"$sum":{'$toInt':"$booked_seats"}},"total":{"$sum":{'$toInt':"$total_seats"}},"amount":{"$sum":{'$toDouble':"$price"}}}
+                "$group":{"_id":"$theatre_code","theatre_location":{"$first":"$theatre_location.loc_real_name"},"theatre_name":{"$first":"$theatre_name"},"show_count":{"$sum":{'$toInt':"$show_count"}},"booked_seats":{"$sum":{'$toInt':"$booked_seats"}},"total_seats":{"$sum":{'$toInt':"$total_seats"}},"available_seats":{"$sum":{'$toInt':"$available_seats"}},"price":{"$sum":{'$toDouble':"$price"}}}
                 },
                 {
-                    "$sort":SON([("_id", 1)])
+                    "$project":{
+                        "_id":0,
+                        "theatre_code":"$_id",
+                        "theatre_location":1,
+                        "theatre_name":1,
+                        "show_count":1,
+                        "booked_seats":1,"total_seats":1,
+                        "available_seats":1,
+                        "price":1
+
+                    }
+                },
+                {
+                    "$sort":SON([("theatre_code", 1)])
                 }
         ]
         pipeline2 = [
@@ -51,10 +81,23 @@ def pytest(request,filmid):
                 "$match": {"film_id":filmid}
                 },
             {
-                "$group":{"_id":"$show_date","film": { "$first": "$film_id"},"booked":{"$sum":{'$toInt':"$booked_seats"}},"total":{"$sum":{'$toInt':"$total_seats"}},"amount":{"$sum":{'$toDouble':"$price"}}}
+                "$group":{"_id":"$show_date","film": { "$first": "$film_id"},"shows":{"$sum":{'$toInt':"$show_count"}},"booked_seats":{"$sum":{'$toInt':"$booked_seats"}},"total_seats":{"$sum":{'$toInt':"$total_seats"}},"available_seats":{"$sum":{'$toInt':"$available_seats"}},"total_amount":{"$sum":{'$toDouble':"$price"}},"last_modified":{"$first":"$last_modified"}}
                 },
                 {
-                    "$sort":SON([("_id", 1)])
+                    "$project":{
+                        "_id": 0,
+                        "date":"$_id",
+                        "film": 1,
+                        "shows": 1,
+                        "booked_seats": 1,
+                        "total_seats": 1,
+                        "available_seats": 1,
+                        "total_amount": 1,
+                        "last_modified": 1
+                    }
+                },
+                {
+                    "$sort":SON([("_date", 1)])
                 }
         ]
         
@@ -67,6 +110,32 @@ def pytest(request,filmid):
         final = {"date":page1,"theatre":page2}
     return JsonResponse(final,safe=False)
 
+@api_view(['GET'])
+def getFilms(request):
+    dbname = Mongoconnect()
+    collection = dbname['api_film']
+    cursor = collection.find({"film_status":"active"},{"_id":0}).sort("release_date",pymongo.DESCENDING)
+    data = list(cursor)
+    data_json = json.loads(json_util.dumps(data))
+    return JsonResponse(data_json,safe=False)
+
+
+@api_view(['GET'])
+def getSingleFilm(request,filmid):
+    dbname = Mongoconnect()
+    collection = dbname['api_film']
+    cursor = collection.find_one({"film_id":filmid})
+    data_json = json.loads(json_util.dumps(cursor))
+    return JsonResponse(data_json,safe=False)
+# POST/PUT
+
+
+
+# DELETE
+
+
+
+# PyMongo End
 # Create your views here.
 
 
@@ -521,23 +590,3 @@ def topweek(request,type):
     return Response(final_data)
     # serializer = mdataserializer(data,many=True)
     # return JsonResponse(serializer.data,safe=False)
-
-    
- # --------------------------------------------------
-        # METHOD1 databytheatre old
-        # data={}
-        # arr=[]
-        # filmname = film.objects.filter(film_id=filmid).first().full_name
-        # print(filmname)
-        # theatre_idList = mdata.objects.filter(film_id=filmid).order_by('theatre_name').values_list('theatre_code',flat=True).distinct()
-        # for row in theatre_idList:
-        #     print(row)
-        #     query = mdata.objects.filter(film_id=filmid, theatre_code=row)
-        #     theatre_name = query.first().theatre_name
-        #     # theatre_location = track.objects.filter(theatre_code = row).first().loc_real_name
-        #     show_count = query.annotate(s_count=Cast('show_count', IntegerField())).aggregate(Sum('show_count'))["show_count__sum"]    
-        #     test_booked = query.annotate(booked_seat=Cast('booked_seats', IntegerField())).aggregate(Sum('booked_seat'))["booked_seat__sum"]
-        #     test_amount = query.annotate(amount = Cast('price',FloatField())).aggregate(Sum('amount',output_field=IntegerField()))["amount__sum"]
-        #     test_total = query.annotate(t_seat=Cast('total_seats', IntegerField())).aggregate(Sum('t_seat'))["t_seat__sum"]
-        #     val = {"name": filmname,'theatre_code':row,'theatre_name':theatre_name,'theatre_location':"theatre_location.capitalize()",'shows':show_count,"booked_seats":test_booked,"total_seats":test_total,'total_amount':test_amount}
-        #     arr.append(val)
