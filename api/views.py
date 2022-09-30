@@ -42,6 +42,7 @@ def pytest(request,filmid):
         
         #Define Collection
         collection = dbname['api_mdata']
+        collection2 = dbname['api_film']
         pipeline1 = [
             {
         "$lookup":{
@@ -78,10 +79,20 @@ def pytest(request,filmid):
         ]
         pipeline2 = [
             {
+        "$lookup":{
+            "from": "api_film",       
+            "localField": "film_id",  
+            "foreignField": "film_id", 
+            "as": "film_data"         
+        }
+    },
+    {   "$unwind":"$film_data" },
+    {"$project":{"film_data._id":0}},
+            {
                 "$match": {"film_id":filmid}
                 },
             {
-                "$group":{"_id":"$show_date","film": { "$first": "$film_id"},"shows":{"$sum":{'$toInt':"$show_count"}},"booked_seats":{"$sum":{'$toInt':"$booked_seats"}},"total_seats":{"$sum":{'$toInt':"$total_seats"}},"available_seats":{"$sum":{'$toInt':"$available_seats"}},"total_amount":{"$sum":{'$toDouble':"$price"}},"last_modified":{"$first":"$last_modified"}}
+                "$group":{"_id":"$show_date","film": { "$first": "$film_data"},"shows":{"$sum":{'$toInt':"$show_count"}},"booked_seats":{"$sum":{'$toInt':"$booked_seats"}},"total_seats":{"$sum":{'$toInt':"$total_seats"}},"available_seats":{"$sum":{'$toInt':"$available_seats"}},"total_amount":{"$sum":{'$toDouble':"$price"}},"last_modified":{"$first":"$last_modified"}}
                 },
                 {
                     "$project":{
