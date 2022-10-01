@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from api.views import getFilms,getSingleFilm,EndPoint,pytest, clear_data, filterData, getShow,getbytheatre,putShow,nw_putData,snippet_detail, filterfilm, films, singleFilm, topweek, tracks, data, filmlist, putData,ReportApi,statuss
+from api.views import getFilms,getSingleFilm,putmData,putFilm,EndPoint,pytest,getShows,getTheaters, clear_data, filterData, getShow,getbytheatre,putShow,nw_putData,snippet_detail, filterfilm, films, singleFilm, topweek, tracks, data, filmlist, putData,ReportApi,statuss
 
 
 urlpatterns = [
@@ -26,4 +26,8 @@ urlpatterns = [
   path('v2/getData/<str:filmid>/',pytest),
   path('v2/getFilms/',getFilms),
   path('v2/getSingleFilm/<str:filmid>/',getSingleFilm),
+  path('v2/getShows/<str:theatrecode>/<str:date>/<str:filmid>/',getShows),
+  path('v2/getTrack/',getTheaters),
+  path('v2/upData/<str:theatrecode>/<str:date>/<str:filmid>/',putmData),
+  path('v2/upFilm/<str:filmid>/',putFilm),
 ]

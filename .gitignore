@@ -1,4 +1,5 @@
 # Default ignored files
+env/
 .venv/
 /utils/filmscrap-local.py
 /utils/maintest2-local.py

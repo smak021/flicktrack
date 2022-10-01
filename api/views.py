@@ -128,8 +128,74 @@ def getSingleFilm(request,filmid):
     cursor = collection.find_one({"film_id":filmid})
     data_json = json.loads(json_util.dumps(cursor))
     return JsonResponse(data_json,safe=False)
-# POST/PUT
 
+@api_view(['GET'])
+def getShows(request,theatrecode,date,filmid): 
+    dbname = Mongoconnect()
+    collection = dbname['api_show']
+    collection2 = dbname['api_film']
+    query = collection2.find_one({'film_id':filmid},{'_id':0,'release_date':1})
+    data_json = json.loads(json_util.dumps(query))
+    release_date=data_json['release_date']
+    relDate = datetime.strptime(release_date,'%Y-%m-%d')
+    todDate = datetime.strptime(date,'%Y%m%d')
+    res = relDate-todDate
+    if(res.days>0):
+        query = collection.find({'film_id':filmid,'show_date':{'$gte':date},'theatre_code':theatrecode},{'_id':0})
+    else:
+        query = collection.find({'film_id':filmid,'show_date':date,'theatre_code':theatrecode},{'_id':0})
+    data_json = json.loads(json_util.dumps(query))
+    return JsonResponse(data_json,safe=False) 
+
+@api_view(['GET'])
+def getTheaters(request):
+    dbname = Mongoconnect()
+    collection = dbname['api_track']
+    cursor = collection.find({},{'_id':0}).sort('theatre_code')
+    data = list(cursor)
+    data_json = json.loads(json_util.dumps(data))
+    return JsonResponse(data_json,safe=False)
+
+
+
+# Add film Done
+# Add Mdata Done
+# Add shows pending(trying for bulk insert with update)
+
+# POST/PUT
+# Mdata
+@api_view(['PUT'])
+def putmData(request,theatrecode,date,filmid):
+    putData = JSONParser().parse(request)
+    dbname = Mongoconnect()
+    collection = dbname['api_mdata']
+    cursor = collection.update({"show_date":date,"theatre_code":theatrecode,'film_id':filmid},putData,upsert=True)
+    return JsonResponse({"status":"Completed"},safe=False)
+
+@api_view(['PUT'])
+def putFilm(request,filmid):
+    putData = JSONParser().parse(request)
+    dbname = Mongoconnect()
+    collection = dbname['api_test']
+    msg=""
+    try:
+        cursor = collection.update({'film_id':filmid},putData,upsert=True)
+    except:
+        msg="Error"
+        print("Error adding film")
+    else:
+        msg="Success"
+        print("Film Added")
+    return JsonResponse({"status":msg},safe=False)
+
+
+# Shows
+
+
+
+# Put Single
+# Put bulk
+# Get shows with date constrains
 
 
 # DELETE
