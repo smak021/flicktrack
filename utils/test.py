@@ -15,24 +15,30 @@ from difflib import SequenceMatcher
 import cloudscraper
 
 
-total = 212
-offset = 27
-avail = 184
-bal = 0
-ft_st = 'FTADJST'
-ft_value = 212
+scrapper = cloudscraper.create_scraper()
+website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid=AVCK&ssid=64225&format=json'
+url2 = scrapper.get(website2).text
+data = json.loads(url2)
+print(data)
 
-if(ft_st == 'FTADJST'):
-    bal = ft_value
+# total = 212
+# offset = 27
+# avail = 184
+# bal = 0
+# ft_st = 'FTADJST'
+# ft_value = 212
+
+# if(ft_st == 'FTADJST'):
+#     bal = ft_value
 
 
-if(avail+bal+offset <= total):
-    offset += bal
-avail_seat = avail + offset
-booked = total -avail_seat
-print(offset)
-print(booked)
-print(avail_seat)
+# if(avail+bal+offset <= total):
+#     offset += bal
+# avail_seat = avail + offset
+# booked = total -avail_seat
+# print(offset)
+# print(booked)
+# print(avail_seat)
 
 # offset = 'SCREEN 1:[Classi:10],SCREEN 2:[Executive:2,Classic:1],SCREEN 3:[Execut:6,Classi:7]'
 # # offset = 'SCREEN 1:[16]'

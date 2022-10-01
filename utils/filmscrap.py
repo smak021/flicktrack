@@ -12,11 +12,11 @@ def bms_calc():
     for fmlo in json_data:
         # loc = fmlo['track_location']
         loc = fmlo
-        scrapper = cloudscraper.create_scraper()
         payload='{"bmsId":"1.2572928712.1661954374374","regionCode":"'+loc+'","isSuperstar":"N"}'
         print(payload)
         requests.adapters.DEFAULT_RETRIES = 5
         try:
+            scrapper = cloudscraper.create_scraper()
             url = scrapper.post('https://in.bookmyshow.com/pwa/api/uapi/movies',data=payload,headers={'content-type':'application/json'}) 
             # print(url.text)
             url_json = json.loads(url.text)
@@ -42,6 +42,7 @@ def bms_calc():
                     # Scrapping film story from site
                     try:
                         print(loc,film_name,film_id)
+                        scrapper = cloudscraper.create_scraper()
                         storyurl = scrapper.get("https://in.bookmyshow.com/"+loc+"/movies/"+film_name+"/"+film_id)
                         html = BeautifulSoup(storyurl.content,"html.parser")
                         query = html.find("section",id="component-1")

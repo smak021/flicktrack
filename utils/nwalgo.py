@@ -158,8 +158,8 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
         price("Scrape Web :Name Error")
     except AttributeError:
         print("Scrape Web: Attribute Error in BS4 Scrapping")
-    except :
-        print("Not found")
+    except:
+        print("Error scraping shows")
     else:
         show_count =0 
         for values in ssid:
@@ -175,7 +175,6 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
             putShow = requests.put('http://flicktracks.herokuapp.com/api/putshow/'+session+'/',json=payload, headers={'Content-type': 'application/json'})
             print(putShow.status_code)
 
-        print("Loop")
         total_seat=0
         available_seat=0  
         booked_seat=0
@@ -229,9 +228,14 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
             putData = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+venue+'/'+bm_show_date+'/'+film_ID+'/',json=payload2, headers={'Content-type': 'application/json'})
             print(putData.status_code)
         except:
-            print("Error in adding data to mData")
+            if(show_count==0):
+                print("No Show")
+            else:
+                print("Error in adding data to mData")
         else:
             print("Added to mData")
+        finally:
+            print("This process completed")
 
                  
 
