@@ -12,6 +12,7 @@ def bms_calc():
     for fmlo in json_data:
         # loc = fmlo['track_location']
         loc = fmlo
+        substring = 'email protected'
         payload='{"bmsId":"1.2572928712.1661954374374","regionCode":"'+loc+'","isSuperstar":"N"}'
         print(payload)
         requests.adapters.DEFAULT_RETRIES = 5
@@ -23,8 +24,7 @@ def bms_calc():
         except:
             print("Error reading url")
             url_json = False
-        substring = 'email protected'
-        if url_json:
+        else:
             for i in url_json["nowShowing"]["arrEvents"]:
                 for film in i["ChildEvents"]:
                     film_name = str(film['EventURL'])
@@ -47,6 +47,7 @@ def bms_calc():
                         html = BeautifulSoup(storyurl.content,"html.parser")
                         query = html.find("section",id="component-1")
                         film_story = query.span.span.text
+                        print(film_story)
                         #end of scrap
                         #scrap cast n crew
                         actors=[]
@@ -54,12 +55,17 @@ def bms_calc():
                         ccquery = html.find("section",id="component-4")
                         classname =  ccquery.a['class'][0]
                         readquery = html.find_all("a",class_=classname)
+                    except AttributeError:
+                        print("Attribute Error: Error reading story / cast")
+                        actors=["NA","NA"]
+                        crew = ["NA"]
+                        film_story='Not Available'
                     except:
-                        print('Error reading')
-                        readquery=None
+                        print('Error')
+                        
                     # acount =0
                     # ccount =0
-                    if readquery != None:
+                    else:
                         for val in readquery:
                             if val.h5.parent.parent.parent.parent.parent['id'] == 'component-4':
                                 if val.h5.string != None:
@@ -71,26 +77,18 @@ def bms_calc():
                                     crew.append(val.h5.string)
                                 else:
                                     actors.append('NA')
-                    else:
-                        actors=["NA","NA"]
-                        crew = ["NA"]
-                    if film_story is None:
-                        film_story='Not Available'
                     actors.append("NA")
                     crew.append("NA")
                     castncrew = {'actors':actors,'crews':crew}
-                    jsoncastncrew = json.dumps(castncrew)
+                    # jsoncastncrew = json.dumps(castncrew)
                     # end cast n crew scrap
-                    if  (film_story == None) or (film_story!= None and substring in film_story):
+                    if (film_story!= None and substring in film_story):
                         film_story='Not Available'
                     print(film_loc)
-                    payload1={"film_id":film_id,"film_name": film_name, "cover_url":image_url,"language":language, "release_date": release_date,"film_story":film_story,"film_genre":film_genre,"film_censor":film_censor,"film_duration":film_length,"full_name":film_real_name,"cast_n_crew":jsoncastncrew}
+                    payload1={"film_id":film_id,"film_name": film_name, "cover_url":image_url,"language":language, "release_date": release_date,"film_story":film_story,"film_genre":film_genre,"film_censor":film_censor,"film_duration":film_length,"full_name":film_real_name,"cast_n_crew":castncrew}
                     url1=requests.put('http://flicktracks.herokuapp.com/api/putfilm/'+film_id+'/', json=payload1, headers={'Content-type': 'application/json'})
-                    # url2 = requests.put('http://flicktracks.herokuapp.com/api/status/',json=payload2,headers={'Content-type': 'application/json'})
                     print(url1.status_code)
-                    
-                    #print(url1.text)
-       
+
 
 # TktNw Function
 
