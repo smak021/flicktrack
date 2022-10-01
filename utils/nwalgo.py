@@ -140,21 +140,27 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
         vjson = json.loads(venue_url)
         theatre_name = vjson['data']['venueName']
     except:
+        print("Error reading venue, substituting code value")
         theatre_name = venue
+    else:
+        print("Added Venue")
     print("Film: ",film_namee)
     tz_NY = pytz.timezone('Asia/Kolkata')   
     datetime_NY = datetime.now(tz_NY)
     d1 = datetime_NY.strftime('%Y%m%d')
-    print("Iteration Start")
+    print("Process Start")
     website = 'https://in.bookmyshow.com/buytickets/'+film_namee+'-'+loc_slug+'/movie-'+fm_loc.lower()+'-'+film_ID+'-MT/'+d1
     try:
         page = scrapper.get(website)
         soup = BeautifulSoup(page.content, "html.parser")
         ssid = soup.find_all('a',{'data-session-id':True,'data-venue-code':venue},class_='showtime-pill')
+    except NameError:
+        price("Scrape Web :Name Error")
+    except AttributeError:
+        print("Scrape Web: Attribute Error in BS4 Scrapping")
     except :
         print("Not found")
-        ssid = False
-    if(ssid):
+    else:
         show_count =0 
         for values in ssid:
             show_count+=1
@@ -178,15 +184,18 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
         show_url = requests.get('http://flicktracks.herokuapp.com/api/getshows/'+venue+'/'+d1+'/'+film_ID+'/')
         show_dict = json.loads(show_url.text)
         count = 0
-        try:
-            for count,show in enumerate(show_dict,start=1):
-                print(show)
-                print(show['show_id'])
-                screen_name =''
-                category_name = ''
-                website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid='+venue+'&ssid='+show['show_id']+'&format=json'
+        for count,show in enumerate(show_dict,start=1):
+            print(show)
+            print(show['show_id'])
+            screen_name =''
+            category_name = ''
+            website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid='+venue+'&ssid='+show['show_id']+'&format=json'
+            try:
                 url2 = scrapper.get(website2).text
                 data = json.loads(url2)
+            except:
+                print("Error reading main data")
+            else:
                 for urll in data['BookMyShow']['arrShowInfo']:
                     tot_seat = int(urll['TotalSeats'])
                     avail_seat = int(urll['AvailableSeats'])
@@ -214,12 +223,16 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
                     screen_name = screen_name+urll['ScreenName']+ ":"
                     Current_date = date.today()
                     d1 = Current_date.strftime('%Y%m%d')
-            cur_time=datetime_NY.strftime('%d/%m/%Y %I:%M %p')
+        cur_time=datetime_NY.strftime('%d/%m/%Y %I:%M %p')
+        try:
             payload2 = {"show_date":bm_show_date,"show_count":count,"film":film_ID,"theatre_code":venue,"theatre_location":fm_loc,"theatre_name":theatre_name,"category_name": category_name.rstrip(':'),"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"last_modified": cur_time}
             putData = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+venue+'/'+bm_show_date+'/'+film_ID+'/',json=payload2, headers={'Content-type': 'application/json'})
             print(putData.status_code)
         except:
-            print("Error Adding.. Skipping")
+            print("Error in adding data to mData")
+        else:
+            print("Added to mData")
+
                  
 
 film_data= requests.get('http://flicktracks.herokuapp.com/api/films/').text
