@@ -18,6 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import mdata, track, film,status,show
 from .serializers import filmfilterserializer,showserializer ,mdataserializer, filmserializer, trackserializer,dataserializer,statusserializer
 import pymongo
+from pymongo.errors import BulkWriteError
 from bson import json_util, ObjectId
 from bson.son import SON
 import os
@@ -274,7 +275,46 @@ def topfive(request):
     final={'weekly':data_json,'total':data2_json}
     return JsonResponse(final,safe=False)
 
+<<<<<<< HEAD
 #  value = {"film_id":item,"total":query_sum,"film_name":film_name,"cover_pic":film_cover,"release_date":release_date}
+=======
+@api_view(['PUT'])
+def putShows(request):
+    print(request.user)
+    print(request.auth)
+    putData = JSONParser().parse(request)
+    dbname = Mongoconnect()
+    collection=dbname['api_test']
+    
+    msg=""
+    try:
+        cursor = collection.insert_many(putData,ordered=False)
+    except BulkWriteError as ex:
+        # print()
+        data = ex.details['writeErrors']
+        # print(data)
+        for row in data:
+            # id = {"Name":row}
+            msg = "Insert error"
+            # print(ex.details)
+            data = row["op"]
+            id = {"Name":data["Name"]}
+            print(id)
+            print(data)
+            try:
+                update = collection.update_one(id,{"$set":data},upsert=True)
+            except Exception as ex:
+                msg = ex.args
+            else:
+                msg="Success"
+        print ("Error")
+    except:
+        msg="Error"
+    else:
+        msg="Success"
+    return JsonResponse({"status":msg},safe=False)
+    
+>>>>>>> 993ffab0d028299958a29dcd0534c112de3a529e
 
 # Put Single
 # Put bulk
