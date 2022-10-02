@@ -15,11 +15,55 @@ from difflib import SequenceMatcher
 import cloudscraper
 
 
+
+# sub
+# try:
+#                 scrapper = cloudscraper.create_scraper()
+#                 url2 = scrapper.get(website2).text
+#                 data = json.loads(url2)
+#             except:
+#                 print("Error reading main data")
+#             else:
+#                 for urll in data['BookMyShow']['arrShowInfo']:
+#                     tot_seat = int(urll['TotalSeats'])
+#                     avail_seat = int(urll['AvailableSeats'])
+#                     total_seat+=int(urll['TotalSeats'])
+#                     offset_in = 0
+#                     if(offset!='na'):
+#                         ind_offset = offset.rsplit('],')
+#                         for roffset in ind_offset:
+#                             offset_splt = roffset.rsplit(':[')
+#                             if(offset_splt[0]==urll['ScreenName']):
+#                                 for item2 in offset_splt[1].replace(']',"").rsplit(','):
+#                                     fin_split = item2.rsplit(':')
+#                                     if(fin_split[0]==urll['CategoryName']):
+#                                         offset_in = int(fin_split[1])
+            
+#                     print("Offset:",offset_in)
+#                     if(tot_seat-avail_seat < offset_in):
+#                         offset_in = 0
+#                     available_seat+= avail_seat + offset_in
+#                     bm_show_date=urll['ShowDateCode']
+#                     booked_seat += tot_seat-(avail_seat+offset_in)
+#                     price = price + (float(urll['Price']) * (tot_seat-(avail_seat+offset_in)))
+#                     category_name= category_name+urll['CategoryName']+":"
+#                     print(category_name)
+#                     screen_name = screen_name+urll['ScreenName']+ ":"
+#                     Current_date = date.today()
+#                     d1 = Current_date.strftime('%Y%m%d')
+
+website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid=MCIK&ssid=9194&format=json'
 scrapper = cloudscraper.create_scraper()
-website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid=AVCK&ssid=64225&format=json'
 url2 = scrapper.get(website2).text
 data = json.loads(url2)
 print(data)
+
+
+# scrapper = cloudscraper.create_scraper()
+# website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid=AVCK&ssid=64225&format=json'
+# url2 = scrapper.get(website2).text
+# data = json.loads(url2)
+# print(data)
 
 # total = 212
 # offset = 27
