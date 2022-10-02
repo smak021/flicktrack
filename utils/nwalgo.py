@@ -190,6 +190,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
             category_name = ''
             website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid='+venue+'&ssid='+show['show_id']+'&format=json'
             try:
+                scrapper = cloudscraper.create_scraper()
                 url2 = scrapper.get(website2).text
                 data = json.loads(url2)
             except:
@@ -232,8 +233,6 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
                 print("No Show")
             else:
                 print("Error in adding data to mData")
-        else:
-            print("Added to mData")
         finally:
             print("This process completed")
 

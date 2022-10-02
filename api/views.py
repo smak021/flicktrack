@@ -99,7 +99,6 @@ def pytest(request,filmid):
         
         #Define Collection
         collection = dbname['api_mdata']
-        collection2 = dbname['api_film']
         pipeline1 = [
             {
         "$lookup":{
@@ -264,7 +263,7 @@ def topfive(request):
     # //
     dbname = Mongoconnect()
     collection = dbname['api_mdata']
-    pipeline = topfivepipeline({"show_date":{"$lte":datetwo,"$gte":dateone} })
+    pipeline = topfivepipeline({"show_date":{"$lte":datetwo,"$gte":dateone}})
     weekly = collection.aggregate(pipeline)
     pipeline = topfivepipeline({})
     total = collection.aggregate(pipeline)
