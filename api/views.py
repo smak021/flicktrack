@@ -271,7 +271,7 @@ def topfive(request):
     data2 = list(total)
     data_json = json.loads(json_util.dumps(data))
     data2_json = json.loads(json_util.dumps(data2))
-    final={'weekly':data_json,'total':data2_json}
+    final={'dates':{'from':dateone,'to':datetwo},'weekly':data_json,'total':data2_json}
     return JsonResponse(final,safe=False)
 
 #  value = {"film_id":item,"total":query_sum,"film_name":film_name,"cover_pic":film_cover,"release_date":release_date}

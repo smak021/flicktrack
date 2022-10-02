@@ -190,7 +190,13 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
             category_name = ''
             website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid='+venue+'&ssid='+show['show_id']+'&format=json'
             scrapper = cloudscraper.create_scraper()
+            url2 = scrapper.get(website2)
+            try:
+                print(url2.json())
+            except Exception as ex:
+                print(ex.args)
             url2 = scrapper.get(website2).text
+            print("Test Url2:",url2)
             data = json.loads(url2)
             for urll in data['BookMyShow']['arrShowInfo']:
                 tot_seat = int(urll['TotalSeats'])
