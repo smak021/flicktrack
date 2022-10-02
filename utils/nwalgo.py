@@ -139,8 +139,9 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
         venue_url=scrapper.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
         vjson = json.loads(venue_url)
         theatre_name = vjson['data']['venueName']
-    except:
+    except Exception as ex:
         print("Error reading venue, substituting code value")
+        print("Code:", ex.args)
         theatre_name = venue
     else:
         print("Added Venue")
@@ -158,8 +159,8 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
         price("Scrape Web :Name Error")
     except AttributeError:
         print("Scrape Web: Attribute Error in BS4 Scrapping")
-    except:
-        print("Error scraping shows")
+    except Exception as ex: 
+        print("Scrapping Error: ",ex.args)
     else:
         show_count =0 
         for values in ssid:
@@ -181,7 +182,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
         price=0
         print(d1)
         show_url = requests.get('http://flicktracks.herokuapp.com/api/getshows/'+venue+'/'+d1+'/'+film_ID+'/')
-        show_dict = json.loads(show_url.text)
+        show_dict = show_url.json()
         count = 0
         for count,show in enumerate(show_dict,start=1):
             print(show)
@@ -192,45 +193,44 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
             scrapper = cloudscraper.create_scraper()
             url2 = scrapper.get(website2)
             try:
-                print(url2.json())
+                data = url2.json()
             except Exception as ex:
                 print(ex.args)
-            url2 = scrapper.get(website2).text
-            print("Test Url2:",url2)
-            data = json.loads(url2)
-            for urll in data['BookMyShow']['arrShowInfo']:
-                tot_seat = int(urll['TotalSeats'])
-                avail_seat = int(urll['AvailableSeats'])
-                total_seat+=int(urll['TotalSeats'])
-                offset_in = 0
-                if(offset!='na'):
-                    ind_offset = offset.rsplit('],')
-                    for roffset in ind_offset:
-                        offset_splt = roffset.rsplit(':[')
-                        if(offset_splt[0]==urll['ScreenName']):
-                            for item2 in offset_splt[1].replace(']',"").rsplit(','):
-                                fin_split = item2.rsplit(':')
-                                if(fin_split[0]==urll['CategoryName']):
-                                    offset_in = int(fin_split[1])
-        
-                print("Offset:",offset_in)
-                if(tot_seat-avail_seat < offset_in):
+            else:
+                for urll in data['BookMyShow']['arrShowInfo']:
+                    tot_seat = int(urll['TotalSeats'])
+                    avail_seat = int(urll['AvailableSeats'])
+                    total_seat+=int(urll['TotalSeats'])
                     offset_in = 0
-                available_seat+= avail_seat + offset_in
-                bm_show_date=urll['ShowDateCode']
-                booked_seat += tot_seat-(avail_seat+offset_in)
-                price = price + (float(urll['Price']) * (tot_seat-(avail_seat+offset_in)))
-                category_name= category_name+urll['CategoryName']+":"
-                print(category_name)
-                screen_name = screen_name+urll['ScreenName']+ ":"
-                Current_date = date.today()
-                d1 = Current_date.strftime('%Y%m%d')
+                    if(offset!='na'):
+                        ind_offset = offset.rsplit('],')
+                        for roffset in ind_offset:
+                            offset_splt = roffset.rsplit(':[')
+                            if(offset_splt[0]==urll['ScreenName']):
+                                for item2 in offset_splt[1].replace(']',"").rsplit(','):
+                                    fin_split = item2.rsplit(':')
+                                    if(fin_split[0]==urll['CategoryName']):
+                                        offset_in = int(fin_split[1])
+            
+                    print("Offset:",offset_in)
+                    if(tot_seat-avail_seat < offset_in):
+                        offset_in = 0
+                    available_seat+= avail_seat + offset_in
+                    bm_show_date=urll['ShowDateCode']
+                    booked_seat += tot_seat-(avail_seat+offset_in)
+                    price = price + (float(urll['Price']) * (tot_seat-(avail_seat+offset_in)))
+                    category_name= category_name+urll['CategoryName']+":"
+                    print(category_name)
+                    screen_name = screen_name+urll['ScreenName']+ ":"
+                    Current_date = date.today()
+                    d1 = Current_date.strftime('%Y%m%d')
         cur_time=datetime_NY.strftime('%d/%m/%Y %I:%M %p')
         try:
             payload2 = {"show_date":bm_show_date,"show_count":count,"film":film_ID,"theatre_code":venue,"theatre_location":fm_loc,"theatre_name":theatre_name,"category_name": category_name.rstrip(':'),"price": price,"booked_seats": booked_seat,"available_seats": available_seat,"total_seats": total_seat,"last_modified": cur_time}
             putData = requests.put('http://flicktracks.herokuapp.com/api/porgdata/'+venue+'/'+bm_show_date+'/'+film_ID+'/',json=payload2, headers={'Content-type': 'application/json'})
             print(putData.status_code)
-        except:
+        except Exception as ex:
+            print(ex.args)
             if(show_count==0):
                 print("No Show")
             else:

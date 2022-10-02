@@ -60,18 +60,18 @@ import socket
 
 
 # wORKING API READ WITHOUT CLOUDSCRAPPER !iMPORTANT
-# answers = socket.getaddrinfo('in.bookmyshow.com', 443)
-# (family, type, proto, canonname, (address, port)) = answers[0]
+answers = socket.getaddrinfo('in.bookmyshow.com', 443)
+(family, type, proto, canonname, (address, port)) = answers[0]
 
-# s = requests.Session()
-# headers = OrderedDict({
-#     'Host': "in.bookmyshow.com",
-#     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0'
-# })
-# s.headers = headers
-# response = s.get(f"https://{address}/serv/getData?cmd=GETSHOWINFOJSON&vid=MCIK&ssid=9194&format=json", headers=headers, verify=False).text
-# print("H")
-# print(response)
+s = requests.Session()
+headers = OrderedDict({
+    'Host': "in.bookmyshow.com",
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0'
+})
+s.headers = headers
+response = s.get(f"https://{address}/serv/getData?cmd=GETSHOWINFOJSON&vid=MCIK&ssid=9194&format=json", headers=headers, verify=False).text
+print("H")
+print(response)
 
 
 
