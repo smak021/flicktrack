@@ -24,11 +24,67 @@ import os
 from pathlib import Path
 import dj_database_url
 
+
 def Mongoconnect():
     client = pymongo.MongoClient(os.environ.get('DATABASE_HOST'))
         #Define Db Name
     dbname = client[os.environ.get('DATABASE_NAME')]
     return dbname
+
+
+def topfivepipeline(condition):
+    pipeline = [ 
+        {
+        "$lookup":{
+                "from": "api_film",       
+                "localField": "film_id",  
+                "foreignField": "film_id", 
+                "as": "film"         
+            }
+        },
+          {   "$unwind":"$film" },
+        {
+            "$project":
+            {
+                'film._id':0,
+                'film_film_status':0,
+                'film.tn_code':0,
+                'film.ptm_code':0,
+                'film.priority':0,
+                'highlight':0,
+                'other_lang_code':0,
+                'film.film_story':0
+            }
+        },
+        {
+            "$match":condition
+        },
+        {
+            "$group":{
+                "_id":{"film_id":"$film_id","show_date":"$show_date"},
+                "film":{"$first":"$film"},
+                "total":{"$sum":{'$toDouble':"$price"}},
+            }
+        },
+        {
+            "$group":{
+                "_id":"$_id.film_id",
+                "film":{"$first":"$film"},
+                "total":{"$sum":{'$toDouble':"$total"}},
+                "rows":{"$push":{"date":"$_id.show_date","amount":"$total"}},
+            }
+        },
+        {
+            "$project":{"_id":0}
+        },
+        {
+            "$sort":SON([("total", -1)])
+        },
+        {
+            "$limit":5
+        }
+    ]
+    return pipeline
 
 # PyMongo
 # GET
@@ -190,8 +246,35 @@ def putFilm(request,filmid):
 
 
 # Shows
+@api_view(['GET'])
+def topfive(request):
+    # find dates
+    dateFormat = '%Y%m%d'
+    tz_NY = pytz.timezone('Asia/Kolkata')   
+    datetime_NY = datetime.now(tz_NY)
+    day = datetime_NY.weekday()
+    if(day<3):
+        offset = 4 + day 
+    else:
+        offset = day - 3
+    datetwo = (datetime_NY - timedelta(days=offset))
+    dateone = (datetwo-timedelta(days=6)).strftime(dateFormat)
+    datetwo = datetwo.strftime(dateFormat)
+    # //
+    dbname = Mongoconnect()
+    collection = dbname['api_mdata']
+    pipeline = topfivepipeline({"show_date":{"$lte":datetwo,"$gte":dateone} })
+    weekly = collection.aggregate(pipeline)
+    pipeline = topfivepipeline({})
+    total = collection.aggregate(pipeline)
+    data = list(weekly)
+    data2 = list(total)
+    data_json = json.loads(json_util.dumps(data))
+    data2_json = json.loads(json_util.dumps(data2))
+    final={'weekly':data_json,'total':data2_json}
+    return JsonResponse(final,safe=False)
 
-
+#  value = {"film_id":item,"total":query_sum,"film_name":film_name,"cover_pic":film_cover,"release_date":release_date}
 
 # Put Single
 # Put bulk
