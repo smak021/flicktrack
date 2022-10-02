@@ -275,9 +275,7 @@ def topfive(request):
     final={'weekly':data_json,'total':data2_json}
     return JsonResponse(final,safe=False)
 
-<<<<<<< HEAD
 #  value = {"film_id":item,"total":query_sum,"film_name":film_name,"cover_pic":film_cover,"release_date":release_date}
-=======
 @api_view(['PUT'])
 def putShows(request):
     print(request.user)
@@ -313,9 +311,6 @@ def putShows(request):
     else:
         msg="Success"
     return JsonResponse({"status":msg},safe=False)
-    
->>>>>>> 993ffab0d028299958a29dcd0534c112de3a529e
-
 # Put Single
 # Put bulk
 # Get shows with date constrains
