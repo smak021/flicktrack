@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import datetime, timedelta
 from operator import le
 from unicodedata import category
@@ -190,9 +191,10 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
             print(show['show_id'])
             screen_name =''
             category_name = ''
+            header = OrderedDict({'Host': "in.bookmyshow.com",'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0' })
             website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid='+venue+'&ssid='+show['show_id']+'&format=json'
             scrapper = cloudscraper.create_scraper()
-            url2 = scrapper.get(website2)
+            url2 = scrapper.get(website2,headers=header)
             print(url2.status_code)
             try:
                 data = url2.json()
