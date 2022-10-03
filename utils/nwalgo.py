@@ -136,8 +136,9 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
     scrapper = cloudscraper.create_scraper()
     print("Venue",venue)
     try:
-        venue_url=scrapper.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue).text
-        vjson = json.loads(venue_url)
+        venue_url=scrapper.get('https://in.bookmyshow.com/serv/getData?cmd=VENUESHOWCASE&venueCode='+venue)
+        print(venue_url.status_code)
+        vjson = venue_url.json()
         theatre_name = vjson['data']['venueName']
     except Exception as ex:
         print("Error reading venue, substituting code value")
@@ -192,6 +193,7 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
             website2 = 'https://in.bookmyshow.com/serv/getData?cmd=GETSHOWINFOJSON&vid='+venue+'&ssid='+show['show_id']+'&format=json'
             scrapper = cloudscraper.create_scraper()
             url2 = scrapper.get(website2)
+            print(url2.status_code)
             try:
                 data = url2.json()
             except Exception as ex:

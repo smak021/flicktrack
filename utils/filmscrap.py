@@ -47,7 +47,7 @@ def bms_calc():
                         html = BeautifulSoup(storyurl.content,"html.parser")
                         query = html.find("section",id="component-1")
                         film_story = query.span.span.text
-                        print(film_story)
+                        # print(film_story)
                         #end of scrap
                         #scrap cast n crew
                         actors=[]
