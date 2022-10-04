@@ -171,7 +171,7 @@ def pytest(request,filmid):
 def getFilms(request):
     dbname = Mongoconnect()
     collection = dbname['api_film']
-    cursor = collection.find({"film_status":"active"},{"_id":0}).sort("release_date",pymongo.DESCENDING)
+    cursor = collection.find({"film_status":{"$ne":'inactive'}},{"_id":0}).sort([("highlight",pymongo.DESCENDING),("release_date",pymongo.DESCENDING),("priority",pymongo.DESCENDING)])
     data = list(cursor)
     data_json = json.loads(json_util.dumps(data))
     return JsonResponse(data_json,safe=False)

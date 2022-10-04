@@ -165,6 +165,8 @@ def ptm_calc():
                         break
                     print("-----------------")
 
+url = requests.post('https://flicktracks.herokuapp.com/api/safeclear/',headers={'content-type':'application/json'}) 
+print(url.status_code,' If 2XX, Succesfully trashed old shows')
 bms_calc()
 # tn_calc()
 ptm_calc()

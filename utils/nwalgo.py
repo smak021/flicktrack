@@ -8,6 +8,8 @@ from datetime import date
 from bs4 import BeautifulSoup
 import pytz
 import cloudscraper
+import time
+import random
 # from api.views import mainData
 
 def dateDiff(inputDate):
@@ -83,12 +85,14 @@ def new_algo_ptm(code,ptm_theatre_id,city,bm_id,offset):
             if(flag):
                 print("Offset:", offset_in)
                 total_seat = section['sTotal']
-                total_seats += total_seat
                 available_seat = (section['sAvail'])
                 if(total_seat-available_seat < offset_in):
                     offset_in = 0
                 if(available_seat + balancing + offset_in <= total_seat):
                     offset_in += balancing
+                if(total_seat<available_seat):
+                    total_seat = available_seat
+                total_seats += total_seat
                 available_seats += (available_seat + offset_in)
                 booked_seat = total_seat-(available_seat + offset_in)
                 price = price + (section['price'] * booked_seat)
@@ -241,6 +245,9 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
                 print("Error in adding data to mData")
         finally:
             print("This process completed")
+        wtime = random.randint(5,10)
+        print("Wait time",wtime)
+        time.sleep(wtime)
 
                  
 
