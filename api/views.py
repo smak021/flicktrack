@@ -130,7 +130,7 @@ def pytest(request,filmid):
                     }
                 },
                 {
-                    "$sort":SON([("price", 1)])
+                    "$sort":SON([("price", -1)])
                 }
         ]
         pipeline2 = [
@@ -154,7 +154,7 @@ def pytest(request,filmid):
                     }
                 },
                 {
-                    "$sort":SON([("date", -1)])
+                    "$sort":SON([("date", 1)])
                 }
         ]
         
