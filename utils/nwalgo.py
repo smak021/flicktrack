@@ -243,11 +243,13 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
                 print("No Show")
             else:
                 print("Error in adding data to mData")
+        else:
+            wtime = random.randint(5,10)
+            print("Wait time",wtime)
+            time.sleep(wtime)
         finally:
             print("This process completed")
-        wtime = random.randint(5,10)
-        print("Wait time",wtime)
-        time.sleep(wtime)
+       
 
                  
 
