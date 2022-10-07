@@ -154,7 +154,7 @@ def pytest(request,filmid):
                     }
                 },
                 {
-                    "$sort":SON([("date", 1)])
+                    "$sort":SON([("date", -1)])
                 }
         ]
         
