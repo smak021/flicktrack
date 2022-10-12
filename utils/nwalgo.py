@@ -223,6 +223,8 @@ def new_algo_bm(film_namee,film_ID, fm_loc, loc_slug, venue,offset):
                     print("Offset:",offset_in)
                     if(tot_seat-avail_seat < offset_in):
                         offset_in = 0
+                    if(tot_seat<avail_seat):
+                        tot_seat = available_seat
                     available_seat+= avail_seat + offset_in
                     bm_show_date=urll['ShowDateCode']
                     booked_seat += tot_seat-(avail_seat+offset_in)
